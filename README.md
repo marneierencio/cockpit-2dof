@@ -1,56 +1,66 @@
 # cockpit-2dof
 
 Cockpit de simulador para jogos de computador, com **plataforma móvel de 2
-graus de liberdade** (arfagem e rolagem) e **duas posições de pilotagem
-ajustáveis na mesma estrutura**: Fórmula 1 e caminhão. Dimensionado para
-uma pessoa de **170 a 175 cm**.
+graus de liberdade** (arfagem e rolagem). Ele passa da posição **Fórmula 1**
+para a de **caminhão** só por articulações, trilhos e travas, na mesma
+estrutura. Dimensionado para uma pessoa de **170 a 175 cm** e para os
+periféricos **Logitech G920** (volante e pedais) e **Driving Force
+Shifter**.
 
-| Configuração F1 | Configuração caminhão |
-|---|---|
-| ![F1](imagens/preview_config_F1.png) | ![Caminhão](imagens/preview_config_caminhao.png) |
+| Posição F1 | Transição | Posição caminhão |
+|---|---|---|
+| ![F1](imagens/preview_config_F1.png) | ![Transição](imagens/preview_transicao.png) | ![Caminhão](imagens/preview_config_caminhao.png) |
 
 ## Conceito
 
-- **Plataforma-base**, fixa no piso, que sustenta a **plataforma-móvel**,
-  onde o piloto senta.
-- União por um **pivô central** (junta cardan) próximo ao centro de
-  gravidade da plataforma-móvel, mais **duas hastes traseiras** ligadas a
-  **braços de manivela acionados por motores de passo**.
-- Motores no mesmo sentido produzem arfagem (aceleração/frenagem); em
-  sentidos opostos, rolagem (força G lateral).
+- **Plataforma-base** fixa no piso, sustentando a **plataforma-móvel**.
+- União por um **pivô central** (cardan) perto do centro de gravidade e por
+  **duas hastes traseiras** com **manivelas acionadas por motores de
+  passo**.
 - Estrutura em **tubo 20×30** nas regiões de maior esforço e **tubo
   10×20** nas de menor esforço.
-- **Banco, pedaleira e volante** ajustáveis em posição, altura e ângulo.
+- **Mecanismos de ajuste:**
+  - banco em quadrilátero articulado com encosto reclinável;
+  - pedaleira basculante;
+  - volante em braço pivotado.
 
-Detalhes completos no **[Memorial Descritivo](docs/MEMORIAL-DESCRITIVO.md)**:
-dimensões, peças, ajustes, cursos, lista de tubos e pontos em aberto.
+  Cada um tem seu carro em trilho e trava por pino.
+- **Componentes dinâmicos:** clicar na plataforma com a ferramenta
+  **Interagir** do SketchUp roda `ANIMATE("modo",0,1)` e anima a troca de
+  posição.
+
+Detalhes completos no **[Memorial Descritivo](docs/MEMORIAL-DESCRITIVO.md)**.
 
 > ⚠️ **Status: anteprojeto.** Não houve cálculo estrutural nem
-> dimensionamento dos motores. Leia a seção 11 do memorial antes de
-> fabricar. O ponto mais crítico é o centro de gravidade alto no modo
-> caminhão.
+> dimensionamento dos motores, e os componentes dinâmicos ainda não foram
+> testados no SketchUp desktop. Leia a seção 12 do memorial antes de
+> fabricar.
 
 ## Estrutura do repositório
 
 | Caminho | Conteúdo |
 |---|---|
-| `docs/MEMORIAL-DESCRITIVO.md` | Memorial descritivo do projeto |
-| `modelo/gerar_modelo.py` | Gerador paramétrico do modelo SketchUp |
-| `modelo/cockpit_simulador_F1_caminhao.skp` | Modelo 3D (SketchUp), quando adicionado |
+| `docs/MEMORIAL-DESCRITIVO.md` | Memorial descritivo (revisão R1) |
+| `modelo/gerar_modelo.py` | Gerador paramétrico do modelo SketchUp (v2) |
+| `modelo/cockpit_2dof_ajustavel_G920.skp` | Modelo 3D v2 com componentes dinâmicos (enviado manualmente) |
+| `modelo/cockpit_simulador_F1_caminhao*.skp` | Modelos da R0 (duas configurações sobrepostas), mantidos como histórico |
 | `imagens/` | Prévias do modelo |
 
-## Abrindo o modelo
+## Usando o modelo
 
-Abra o `.skp` no SketchUp (desktop ou web) e use as abas de cena:
+1. Abra o `.skp` no **SketchUp desktop**.
+2. Selecione a ferramenta **Interagir** e clique na plataforma móvel para
+   alternar entre F1 e caminhão.
+3. Para escolher a posição sem animar, use **Janela → Opções do
+   componente**.
+4. Se alguma peça girar para o lado errado, troque **Sentido** para
+   **Invertido** nas Opções do componente.
 
 | Cena | Mostra |
 |---|---|
-| `F1 - 3/4` / `F1 - Lateral` | Postura de Fórmula 1 |
-| `Caminhao - 3/4` / `Caminhao - Lateral` | Postura de caminhão |
-| `Base e Atuadores` | Somente a estrutura, motores, manivelas e hastes |
-
-As duas configurações ficam nas tags `Config_F1` e `Config_Caminhao`. A
-estrutura comum fica na tag `Estrutura`.
+| `Vista 3/4` / `Vista Lateral` | Conjunto completo |
+| `Mecanismos (sem manequim)` | Mecanismos sem os manequins |
+| `Base e Atuadores` | Somente a estrutura fixa, motores, manivelas e hastes |
 
 ## Regenerando o modelo
 
@@ -61,8 +71,6 @@ SketchUp MCP**, e não no console Ruby do SketchUp desktop.
    `build_model` com `clean: true`.
 2. Chame `save_model` para obter o `.skp`.
 
-Para mudar uma postura, edite os dicionários `CONFIG_F1` /
-`CONFIG_CAMINHAO` no fim do script. Banco, pedaleira e mastro do volante
-se reposicionam automaticamente a partir da postura do manequim. O
-resultado da execução traz alcance dos braços, folgas e posições-chave
-para conferência.
+Para mudar uma postura, edite `POSE_F1` / `POSE_TRK`. Os pivôs e cursos
+dos mecanismos são recalculados a partir delas. O relatório devolvido pela
+execução traz erros de síntese, folgas e cursos para conferência.
