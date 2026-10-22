@@ -1,5 +1,5 @@
 # =============================================================================
-# 2-DOF motion simulator cockpit - parametric SketchUp model generator
+# 2-DOF motion simulator cockpit - parametric SketchUp model generator (v2)
 #
 # Runs inside the SketchUp MCP `build_model` sandbox (Trimble SketchUp
 # connector). The sandbox pre-loads `model`, `math`, SUPoint3D, SUVector3D,
@@ -9,23 +9,49 @@
 # the SketchUp desktop Ruby console.
 #
 # Usage: send the whole file as the `code` of one `build_model` call with
-# `clean: true`, then call `save_model`.
+# `clean: true`, then call `save_model`. Optionally call `apply_state(m)`
+# (stored in `session_state`) in a later call to preview an intermediate
+# mechanism position (0 = F1, 1 = truck) before saving.
+#
+# v2: ONE adjustable cockpit instead of two overlaid configurations. The seat
+# (four-bar linkage + reclining back), the pedal box (tilting deck) and the
+# steering (pivoting arm) move between the F1 and truck postures only through
+# hinges, rails and a wheel quick-release. Each moving part is a SketchUp
+# Dynamic Component driven by one attribute, `modo` (0 = F1, 1 = truck), on
+# the `Plataforma_Movel` component; its OnClick runs ANIMATE("modo",0,1), so
+# clicking the platform with the Interact tool animates the change-over.
 #
 # Conventions
 #   - All dimensions below are in millimetres; SketchUp's internal unit is the
 #     inch, so every coordinate goes through MM (= 1/25.4) at creation time.
+#     Dynamic Component formulas use centimetres (`_lengthunits`).
 #   - Axes: X = lateral (driver's right is +X), Y = longitudinal (driver faces
 #     +Y, rear of the platform is Y = 0), Z = up (floor is Z = 0).
+#   - Angles in the sagittal (Y-Z) plane are measured from +Y towards +Z, i.e.
+#     a positive rotation about +X (right-hand rule).
 #   - "H" tubes are 20x30 mm (high stress / weight), "L" tubes are 10x20 mm
 #     (low stress). The larger side always points along the tube's `up` hint.
 #
-# Model tree
-#   Cockpit_Simulador
-#     Plataforma_Base   (fixed: frame, pivot tower, cardan joint, actuators)
-#     Plataforma_Movel  (moving frame + one group per seating configuration)
-#       Chassi_Movel
-#       Config_F1        (seat, pedals, wheel, mast, mannequin) - tag Config_F1
-#       Config_Caminhao  (same parts, truck posture)            - tag Config_Caminhao
+# Model tree (model root)
+#   Plataforma_Base (group)       fixed frame, pivot tower, cardan, actuators
+#   Plataforma_Movel (DC)         chassis + adjustable parts; holds `modo`
+#     Chassi_Movel (group)
+#     Carro_Banco (DC, slides)
+#       Biela_Banco_* (DC, rotate)      four-bar links
+#         Banco (DC, counter-rotates)   level sub-frame, only under Biela_Banco_E_Tras
+#           Assento (DC, tilts about C)        pan: follows the thigh in F1
+#           Encosto (DC, reclines about C)
+#             Encosto_Superior (DC)            shoulder/head shell, constant angle
+#     Carro_Pedaleira (DC, slides)
+#       Pedaleira_Basculante (DC, tilts)
+#     Mastro_Volante (DC, slides)
+#       Braco_Volante (DC, tilts)      carries the G920 wheel base
+#     Manequim_F1 / Manequim_Caminhao (DC, shown only at modo = 0 / 1)
+#
+# Peripherals: Logitech G920 wheel + pedals and the Driving Force Shifter,
+# modelled as named components (G920_Volante, G920_Pedais, G920_Cambio) from
+# the manufacturer's published overall dimensions, so they can be swapped for
+# a detailed model in SketchUp desktop (right click > Reload).
 # =============================================================================
 
 MM = 1.0 / 25.4
@@ -51,6 +77,12 @@ def sag(deg):
     """Unit vector in the sagittal (Y-Z) plane, angle measured from +Y towards +Z."""
     a = math.radians(deg)
     return (0.0, math.cos(a), math.sin(a))
+
+def rot_x(p, centre, deg):
+    """Rotate point p about the X-parallel axis through `centre` (right-hand rule)."""
+    a = math.radians(deg)
+    dy, dz = p[1] - centre[1], p[2] - centre[2]
+    return (p[0], centre[1] + dy * math.cos(a) - dz * math.sin(a), centre[2] + dy * math.sin(a) + dz * math.cos(a))
 
 def local_to_world(o, xa, ya, za, p):
     """Map a point given in the frame (o, xa, ya, za) to world coordinates."""
@@ -78,7 +110,7 @@ def paint(ents, m):
         f.set_back_material(m)
 
 def new_group(parent, name):
-    """Create a named group inside `parent` (or at model root when parent is None)."""
+    """Create a named group inside `parent` (group or definition; model root when None)."""
     g = Group()
     if parent is None:
         model.get_entities().add_group(g)
@@ -87,12 +119,27 @@ def new_group(parent, name):
     g.set_name(name)
     return g
 
+def named_component(parent, name):
+    """Component (not group) placed at identity inside `parent`, so it can be
+    swapped in SketchUp desktop via right click > Reload."""
+    cd = ComponentDefinition()
+    cd.set_name(name)
+    model.add_component_definitions([cd])
+    inst = cd.create_instance()
+    inst.set_name(name)
+    parent.get_entities().add_instance(inst)
+    return cd
+
 def frame_tf(o, xa, ya, za, sx=1.0, sy=1.0, sz=1.0):
     """Column-major transform from a local frame (unit axes, optional scale) and an origin in mm."""
     return SUTransformation([xa[0] * sx, xa[1] * sx, xa[2] * sx, 0,
                              ya[0] * sy, ya[1] * sy, ya[2] * sy, 0,
                              za[0] * sz, za[1] * sz, za[2] * sz, 0,
                              o[0] * MM, o[1] * MM, o[2] * MM, 1])
+
+def move_tf(o):
+    """Pure translation (mm)."""
+    return frame_tf(o, (1, 0, 0), (0, 1, 0), (0, 0, 1))
 
 def axes_from(d, up=(0, 0, 1)):
     """Right-handed frame with local X along d and local Z as close to `up` as possible."""
@@ -207,7 +254,8 @@ def tube(parent, name, p0, p1, kind="H", up=(0, 0, 1), size=None, m=None):
 def block(parent, name, x0, y0, z0, x1, y1, z1, m):
     """Axis-aligned box (plates, brackets, motor bodies)."""
     g = new_group(parent, name)
-    g.get_entities().fill(box_geom(x0, y0, z0, x1, y1, z1), weld_vertices=True)
+    g.get_entities().fill(box_geom(min(x0, x1), min(y0, y1), min(z0, z1), max(x0, x1), max(y0, y1), max(z0, z1)),
+                          weld_vertices=True)
     paint(g.get_entities(), m)
     return g
 
@@ -265,6 +313,84 @@ def torus(parent, name, o, xa, ya, za, R, r, m, nR=36, nr=10):
     paint(g.get_entities(), m)
     return g
 
+def pin(parent, name, c, half, r=8):
+    """Locking/hinge pin along X centred on c."""
+    return cyl(parent, name, (c[0] - half, c[1], c[2]), (c[0] + half, c[1], c[2]), r, M_STEEL, 12)
+
+# ----------------------------------------------------------------------------
+# Dynamic Components
+# Every moving part is a component whose geometry sits in a wrapper group
+# translated by -origin, so the component's own origin is its hinge axis (or
+# any reference point for sliders) and everything can be modelled in world
+# coordinates of the F1 pose. In the F1 pose (modo = 0) every DC frame is an
+# un-rotated translation of the world frame.
+# ----------------------------------------------------------------------------
+
+DC_STATE = []  # (instance, rel_origin_mm, slide_mm_per_unit, rot_deg_per_unit, hide_rule)
+
+def _tv(v):
+    if isinstance(v, str):
+        return TypedValue(string_value=v)
+    return TypedValue(double_value=float(v))
+
+def dc_write(cd, attrs):
+    """Write Dynamic Component attributes on a definition (read by SketchUp's DC extension)."""
+    ad = cd.get_attribute_dictionary("dynamic_attributes")
+    for k, v in attrs.items():
+        ad[k] = _tv(v)
+
+def dc_child(parent_cd, name, origin, parent_origin, slide=(0.0, 0.0, 0.0), rot=0.0, hide=None):
+    """Create a dynamic child component.
+
+    origin/parent_origin: world points (F1 pose) of this component's and its
+    parent's origins. slide: displacement (mm) at modo = 1, in the parent's
+    frame. rot: rotation about local X (deg) at modo = 1, multiplied by
+    `sentido`. hide: None, "F1" (visible only at modo = 0) or "TRK" (visible
+    only at modo = 1).
+    Returns (definition, instance, wrapper group for geometry).
+    """
+    cd = ComponentDefinition()
+    cd.set_name(name)
+    model.add_component_definitions([cd])
+    wrap = new_group(cd, name + "_geometria")
+    wrap.set_transform(move_tf(v_mul(origin, -1)))
+    inst = cd.create_instance()
+    inst.set_name(name)
+    rel = v_sub(origin, parent_origin)
+    inst.set_transform(move_tf(rel))
+    parent_cd.get_entities().add_instance(inst)
+    a = {"_name": name, "_lengthunits": "CENTIMETERS", "_formatversion": 1.0,
+         "modo": 0.0, "_modo_label": "modo", "_modo_formula": "Parent!modo", "_modo_access": "NONE",
+         "sentido": 1.0, "_sentido_label": "sentido", "_sentido_formula": "Parent!sentido", "_sentido_access": "NONE"}
+    for ax, i in (("x", 0), ("y", 1), ("z", 2)):
+        f = "%.2f" % (rel[i] / 10.0)
+        if abs(slide[i]) > 1e-6:
+            f += "+modo*(%.2f)" % (slide[i] / 10.0)
+        a[ax] = rel[i] * MM
+        a["_%s_label" % ax] = ax.upper()
+        a["_%s_formula" % ax] = f
+    if rot:
+        a.update({"rotx": 0.0, "_rotx_label": "RotX", "_rotx_formula": "modo*sentido*(%.3f)" % rot})
+    if hide:
+        rule = {"F1": "IF(modo>0.001,1,0)", "TRK": "IF(modo<0.999,1,0)"}[hide]
+        a.update({"hidden": 0.0 if hide == "F1" else 1.0, "_hidden_label": "Hidden", "_hidden_formula": rule})
+        if hide == "TRK":
+            inst.set_hidden(True)
+    dc_write(cd, a)
+    DC_STATE.append((inst, rel, slide, rot, hide))
+    return cd, inst, wrap
+
+def apply_state(m, sentido=1.0):
+    """Pose every dynamic part exactly as its DC formulas would at modo = m (preview helper)."""
+    for inst, rel, slide, rot, hide in DC_STATE:
+        o = v_add(rel, v_mul(slide, m))
+        a = math.radians(rot * m * sentido)
+        c, s = math.cos(a), math.sin(a)
+        inst.set_transform(frame_tf(o, (1, 0, 0), (0, c, s), (0, -s, c)))
+        if hide:
+            hidden = m > 0.001 if hide == "F1" else m < 0.999
+            inst.set_hidden(hidden)
+
 # ----------------------------------------------------------------------------
 # Materials
 # ----------------------------------------------------------------------------
@@ -283,14 +409,13 @@ M_WHEEL = get_mat("Volante_preto", 34, 34, 38)
 M_CARB = get_mat("Volante_carbono", 60, 62, 70)
 M_BONE = get_mat("Manequim_segmento", 208, 211, 218)
 M_JOINT = get_mat("Manequim_articulacao", 70, 92, 124)
-
-root = new_group(None, "Cockpit_Simulador")
+M_LINK = get_mat("Articulacao_azul", 40, 110, 190)
 
 # ============================================================================
-# PLATAFORMA-BASE (fixed to the floor)
+# PLATAFORMA-BASE (fixed to the floor) - unchanged from v1
 # ============================================================================
 
-base = new_group(root, "Plataforma_Base")
+base = new_group(None, "Plataforma_Base")
 Y0, Y1 = -200.0, 1850.0
 for s in (-1, 1):
     tube(base, "Base_Longarina_" + ("E" if s < 0 else "D"), (s * 330, Y0, 15), (s * 330, Y1, 15), "H")
@@ -300,15 +425,12 @@ tube(base, "Base_Diagonal", (-320, 850, 10), (320, 1690, 10), "L")
 for s in (-1, 1):
     tube(base, "Base_Suporte_Motor_" + ("E" if s < 0 else "D"), (s * 115, -110, 15), (s * 115, 30, 15), "H")
 
-# Pivot tower: carries the whole moving mass, so it is all 20x30.
 tw = new_group(base, "Torre_Pivo")
 for sx in (-1, 1):
     for (yb, yt) in ((560, 670), (840, 730)):
         tube(tw, "Torre_Perna", (sx * 200, yb, 30), (sx * 45, yt, 215), "H", up=(0, 1 if yb < 700 else -1, 0))
 block(tw, "Torre_Chapa_Topo", -80, 620, 215, 80, 780, 228, M_PLATE)
 
-# Cardan (universal) joint: allows roll (sideways) and pitch (fore/aft); yaw is
-# blocked by the two rear rods.
 cj = new_group(base, "Junta_Universal_Cardan")
 block(cj, "Garfo_Inferior_Base", -35, 655, 228, 35, 745, 255, M_PIVOT)
 for sy in (-1, 1):
@@ -319,30 +441,194 @@ for sx in (-1, 1):
     block(cj, "Garfo_Superior_Orelha", sx * 48 - 7, 684, 270, sx * 48 + 7, 716, 318, M_PIVOT)
 block(cj, "Garfo_Superior_Base", -60, 670, 318, 60, 730, 340, M_PIVOT)
 
-# Actuators: NEMA 34 stepper + planetary gearbox + 100 mm crank, one per side.
 act = new_group(base, "Atuadores_Traseiros")
 for s in (-1, 1):
     side = "E" if s < 0 else "D"
     a = new_group(act, "Atuador_" + side)
-    block(a, "Chapa_Suporte_Motor", min(s * 285, s * 295), -120, 30, max(s * 285, s * 295), 40, 230, M_PLATE)
+    block(a, "Chapa_Suporte_Motor", s * 285, -120, 30, s * 295, 40, 230, M_PLATE)
     cyl(a, "Redutor_Planetario", (s * 285, MY, MZ), (s * 190, MY, MZ), 42, M_STEEL)
-    block(a, "Motor_Passo_NEMA34", min(s * 190, s * 40), MY - 43, MZ - 43, max(s * 190, s * 40), MY + 43, MZ + 43, M_MOTOR)
-    block(a, "Calco_Motor", min(s * 105, s * 125), MY - 30, 30, max(s * 105, s * 125), MY + 30, MZ - 43, M_PLATE)
+    block(a, "Motor_Passo_NEMA34", s * 190, MY - 43, MZ - 43, s * 40, MY + 43, MZ + 43, M_MOTOR)
+    block(a, "Calco_Motor", s * 105, MY - 30, 30, s * 125, MY + 30, MZ - 43, M_PLATE)
     cyl(a, "Eixo_Saida", (s * 295, MY, MZ), (s * 318, MY, MZ), 10, M_STEEL)
     tube(a, "Braco_Manivela", (s * 310, MY - 15, MZ), (s * 310, 60 + 15, MZ), "H", size=(14.0, 34.0), m=M_STEEL)
     ball(a, "Terminal_Rotula_Inf", (s * 310, 60, MZ), 13, M_STEEL)
 
-# Front bump stops: limit how far the platform nose can drop.
 for s in (-1, 1):
     tube(base, "Batente_Coluna_" + ("E" if s < 0 else "D"), (s * 270, 1700, 30), (s * 270, 1700, 140), "H", up=(0, 1, 0))
     cyl(base, "Batente_Borracha_" + ("E" if s < 0 else "D"), (s * 270, 1700, 140), (s * 270, 1700, 175), 24, M_RUBBER)
 
 # ============================================================================
-# PLATAFORMA-MOVEL (frame shared by both configurations)
+# Postures (mannequin kinematics). Everything adjustable is derived from these.
 # ============================================================================
 
-mov = new_group(root, "Plataforma_Movel")
-fr = new_group(mov, "Chassi_Movel")
+THIGH, SHANK, TORSO, UPPER_ARM, FOREARM_TO_GRIP = 420.0, 420.0, 520.0, 300.0, 310.0
+HIP_HALF_WIDTH, SHOULDER_HALF_WIDTH = 90.0, 195.0
+SUB_DEG = 9.0          # seat sub-frame angle (the parallelogram keeps it constant)
+X = (1.0, 0.0, 0.0)
+
+# Logitech G920 / Driving Force Shifter (published overall sizes, mm). Internal
+# proportions (rim section, pedal pad layout, mounting points) are estimates.
+G920_RIM_R = 135.0                  # wheel: 270 H x 260 W x 278 D
+G920_WHEEL_PLANE = 80.0             # rim plane vs. the base's mounting face (estimate)
+G920_PED_W, G920_PED_D, G920_PED_H = 428.5, 311.0, 167.0
+G920_PAD_PITCH = 125.0              # clutch / brake / throttle spacing (estimate)
+PEDAL_DEPTH = 130.0                 # sole (pad face) -> pedal-unit mounting face
+SHIFTER_W, SHIFTER_D, SHIFTER_H = 130.0, 165.0, 167.0
+
+# Angles in degrees (sagittal plane); `hip` is (Y, height above ZP).
+# `pan` is the seat-pan angle; in F1 it matches the thigh so the pan carries it.
+# The F1 head rests on the upper back segment (see Encosto_Superior).
+POSE_F1 = dict(tag="F1", hip=(650.0, 290.0), torso=145.0, pan=25.0, thigh=25.0, knee=145.0, ankle=100.0,
+               knee_x=100.0, ankle_x={"E": -115.0, "D": 125.0}, head=(-40.0, 213.0),
+               wheel_off=(420.0, 60.0), wheel_tilt=80.0, wheel_r=G920_RIM_R, grip=90.0)
+POSE_TRK = dict(tag="Caminhao", hip=(700.0, 597.0), torso=105.0, pan=9.0, thigh=5.0, knee=120.0, ankle=90.0,
+                knee_x=130.0, ankle_x={"E": -115.0, "D": 125.0}, head=(-10.0, 230.0),
+                wheel_off=(460.0, -100.0), wheel_tilt=45.0, wheel_r=G920_RIM_R, grip=60.0)
+
+def posture(c):
+    """Joint positions, seat corner, heel point and wheel pose for one posture."""
+    P = {"c": c}
+    Hc = (0.0, c["hip"][0], ZP + c["hip"][1])
+    tdir = sag(c["torso"])
+    S = v_add(Hc, v_mul(tdir, TORSO))
+    legs = {}
+    for side, sx in (("E", -1), ("D", 1)):
+        hx, kx, ax = sx * HIP_HALF_WIDTH, sx * c["knee_x"], c["ankle_x"][side]
+        th = math.radians(c["thigh"])
+        ps = math.radians(c["thigh"] - (180 - c["knee"]))
+        lt = math.sqrt(THIGH ** 2 - (kx - hx) ** 2)  # in-plane length keeps the 3D length exact
+        ls = math.sqrt(SHANK ** 2 - (ax - kx) ** 2)
+        hip = (hx, Hc[1], Hc[2])
+        K = (kx, hip[1] + lt * math.cos(th), hip[2] + lt * math.sin(th))
+        A = (ax, K[1] + ls * math.cos(ps), K[2] + ls * math.sin(ps))
+        phi = math.degrees(ps) + 180 - c["ankle"]  # heel -> toe direction angle
+        f = sag(phi)
+        s = (0.0, f[2], -f[1])  # sole normal (towards the pedal)
+        heel = v_add(A, v_add(v_mul(s, 70), v_mul(f, -50)))
+        legs[side] = dict(hip=hip, K=K, A=A, f=f, s=s, heel=heel, phi=phi)
+    tw_ = math.radians(c["wheel_tilt"])
+    n = (0.0, -math.sin(tw_), math.cos(tw_))  # wheel axis, pointing at the driver
+    eu = (0.0, math.cos(tw_), math.sin(tw_))  # 12 o'clock direction in the wheel plane
+    W = v_add(S, (0.0, c["wheel_off"][0], c["wheel_off"][1]))
+    R, g = c["wheel_r"], math.radians(c["grip"])
+    grips = {"E": v_add(W, v_add(v_mul(X, -R * math.sin(g)), v_mul(eu, R * math.cos(g)))),
+             "D": v_add(W, v_add(v_mul(X, R * math.sin(g)), v_mul(eu, R * math.cos(g))))}
+    # seat corner C: hip 95 mm above the pan and 115 mm in front of the back
+    al, be = math.radians(c["pan"]), math.radians(c["torso"])
+    npn = (0.0, -math.sin(al), math.cos(al))
+    nb = (0.0, math.sin(be), -math.cos(be))
+    r1, r2 = v_dot(npn, Hc) - 95, v_dot(nb, Hc) - 115
+    det = npn[1] * nb[2] - npn[2] * nb[1]
+    C = (0.0, (r1 * nb[2] - npn[2] * r2) / det, (npn[1] * r2 - r1 * nb[1]) / det)
+    Ph = (0.0, 0.5 * (legs["E"]["heel"][1] + legs["D"]["heel"][1]), 0.5 * (legs["E"]["heel"][2] + legs["D"]["heel"][2]))
+    P.update(Hc=Hc, S=S, tdir=tdir, legs=legs, W=W, n=n, eu=eu, R=R, grips=grips, C=C, Ph=Ph,
+             head=v_add(S, (0.0, c["head"][0], c["head"][1])))
+    return P
+
+F1, TRK = posture(POSE_F1), posture(POSE_TRK)
+REPORT = {}
+
+# ============================================================================
+# Mechanism synthesis: solve the hinge positions so that ONE rotation plus ONE
+# rail slide takes each part exactly from its F1 pose to its truck pose.
+# ============================================================================
+
+def solve_pivot(p1, p2, alpha, pz):
+    """Pivot (y at fixed height pz) and rail slide dy such that rotating p1 by
+    alpha about the pivot, then sliding by dy along Y, lands on p2."""
+    ca, sa = math.cos(math.radians(alpha)), math.sin(math.radians(alpha))
+    py = p1[1] - (p2[2] - pz - (p1[2] - pz) * ca) / sa
+    q = rot_x(p1, (0.0, py, pz), alpha)
+    return (0.0, py, pz), p2[1] - q[1]
+
+# --- seat: parallelogram four-bar (level sub-frame) + carriage slide; the pan
+# and the back hinge on the sub-frame at C, so their angles are free ---
+P_SUB, N_SUB = sag(SUB_DEG), sag(SUB_DEG + 90)
+LINK = 360.0
+B_R1 = v_sub(v_add(F1["C"], v_mul(P_SUB, 70)), v_mul(N_SUB, 85))   # link top pivots on the sub-frame
+B_F1 = v_sub(v_add(F1["C"], v_mul(P_SUB, 380)), v_mul(N_SUB, 85))
+TH1 = math.asin((B_R1[2] - (ZP + 65)) / LINK)                     # rear carriage pivot at ZP + 65
+DZ = TRK["C"][2] - F1["C"][2]
+TH2 = math.asin(math.sin(TH1) + DZ / LINK)
+A_R = v_sub(B_R1, v_mul((0.0, math.cos(TH1), math.sin(TH1)), LINK))
+A_F = v_add(A_R, v_sub(B_F1, B_R1))
+SEAT_SLIDE = (TRK["C"][1] - F1["C"][1]) - LINK * (math.cos(TH2) - math.cos(TH1))
+LINK_ROT = math.degrees(TH2 - TH1)
+BACK_ROT = POSE_TRK["torso"] - POSE_F1["torso"]
+PAN_ROT = POSE_TRK["pan"] - POSE_F1["pan"]
+HEADREST_DEG = POSE_TRK["torso"]  # upper back segment keeps the truck back angle in both postures
+REPORT["banco"] = {"biela_graus_F1_cam": [round(math.degrees(TH1), 1), round(math.degrees(TH2), 1)],
+                   "curso_carro_mm": round(SEAT_SLIDE, 1), "reclinacao_graus": BACK_ROT,
+                   "giro_assento_graus": PAN_ROT}
+
+# --- pedal box: deck tilts about P on a carriage that slides ---
+PED_ALPHA = TRK["legs"]["D"]["phi"] - F1["legs"]["D"]["phi"]
+PED_P, PED_SLIDE = solve_pivot(F1["Ph"], TRK["Ph"], PED_ALPHA, ZP + 130.0)
+REPORT["pedaleira"] = {"pivo_y_z": [round(PED_P[1]), round(PED_P[2] - ZP)], "giro_graus": round(PED_ALPHA, 1),
+                       "curso_carro_mm": round(PED_SLIDE, 1)}
+
+# --- steering: arm tilts about Q on a mast that slides. Among crossbar
+# heights that clear both postures' legs (thighs, knees, shins) by >= 40 mm
+# and stay below the eye -> rim-top sight line by >= 30 mm, take the one with
+# the shortest arm (pivot -> wheel centre). ---
+WHEEL_ALPHA = POSE_TRK["wheel_tilt"] - POSE_F1["wheel_tilt"]
+
+def leg_clearance(P, y, z, half):
+    """Sagittal clearance from a full-width bar at (y, z) to both legs."""
+    def sd(a, b):
+        dy, dz = b[1] - a[1], b[2] - a[2]
+        t = max(0.0, min(1.0, ((y - a[1]) * dy + (z - a[2]) * dz) / (dy * dy + dz * dz)))
+        return math.hypot(y - a[1] - t * dy, z - a[2] - t * dz)
+    c = 1e9
+    for L in P["legs"].values():
+        c = min(c, sd(L["hip"], L["K"]) - 66 - half, sd(L["K"], L["A"]) - 50 - half)
+    return c
+
+def sight_margin(P, y, ztop):
+    """Height of the eye -> rim-top line above ztop at station y (only ahead of the rim)."""
+    eye = v_add(P["head"], (0.0, 60.0, 20.0))
+    top = v_add(P["W"], v_mul(P["eu"], P["R"] + 14))
+    if y <= top[1]:
+        return 999.0
+    return eye[2] + (top[2] - eye[2]) * (y - eye[1]) / (top[1] - eye[1]) - ztop
+
+Q_PIV, best = None, None
+for qz in range(int(ZP + 450), int(ZP + 950), 10):
+    q, dm = solve_pivot(F1["W"], TRK["W"], WHEEL_ALPHA, float(qz))
+    c1, c2 = leg_clearance(F1, q[1], qz, 15), leg_clearance(TRK, q[1] + dm, qz, 15)
+    s1, s2 = sight_margin(F1, q[1], qz + 15), sight_margin(TRK, q[1] + dm, qz + 15)
+    arm_len = v_len(v_sub(F1["W"], q))
+    if c1 >= 40 and c2 >= 40 and s1 >= 30 and s2 >= 30 and 150 < q[1] < 1650 and 150 < q[1] + dm < 1650:
+        if best is None or arm_len < best[0]:
+            best = (arm_len, q, dm, c1, c2, min(s1, s2))
+_, Q_PIV, MAST_SLIDE, c1, c2, smin = best
+REPORT["volante"] = {"pivo_y_z": [round(Q_PIV[1]), round(Q_PIV[2] - ZP)], "giro_graus": WHEEL_ALPHA,
+                     "curso_mastro_mm": round(MAST_SLIDE, 1), "braco_mm": round(best[0]),
+                     "folga_pernas_F1_cam_mm": [round(c1), round(c2)], "margem_visao_mm": round(smin)}
+
+# ============================================================================
+# PLATAFORMA-MOVEL (root Dynamic Component)
+# ============================================================================
+
+O = (0.0, 0.0, 0.0)
+mov_cd = ComponentDefinition()
+mov_cd.set_name("Plataforma_Movel")
+model.add_component_definitions([mov_cd])
+dc_write(mov_cd, {
+    "_name": "Plataforma_Movel", "_lengthunits": "CENTIMETERS", "_formatversion": 1.0,
+    "modo": 0.0, "_modo_label": "Modo", "_modo_access": "LIST", "_modo_options": "&F1=0&Caminhao=1&",
+    "_modo_formlabel": "Posicao de pilotagem (0 = F1, 1 = Caminhao)", "_modo_units": "FLOAT",
+    "sentido": 1.0, "_sentido_label": "Sentido", "_sentido_access": "LIST", "_sentido_options": "&Padrao=1&Invertido=-1&",
+    "_sentido_formlabel": "Sentido das rotacoes (troque se a animacao girar ao contrario)", "_sentido_units": "FLOAT",
+    "onclick": 'ANIMATE("modo",0,1)', "_onclick_label": "onClick", "_onclick_formula": 'ANIMATE("modo",0,1)',
+    "description": "Clique com a ferramenta Interagir para alternar entre as posicoes F1 e Caminhao.",
+    "_description_label": "Description", "_description_access": "VIEW",
+})
+mov_inst = mov_cd.create_instance()
+mov_inst.set_name("Plataforma_Movel")
+model.get_entities().add_instance(mov_inst)
+
+fr = new_group(mov_cd, "Chassi_Movel")
 for s in (-1, 1):
     tube(fr, "Longarina_Principal_" + ("E" if s < 0 else "D"), (s * 270, 0, 365), (s * 270, 1780, 365), "H")
 for y in (15.0, 700.0, 1765.0):
@@ -351,37 +637,207 @@ for y in (350.0, 1100.0, 1450.0):
     tube(fr, "Travessa_Leve_y%d" % int(y), (-260, y, 370), (260, y, 370), "L")
 for s in (-1, 1):
     tube(fr, "Trilho_Banco_" + ("E" if s < 0 else "D"), (s * 150, 5, 390), (s * 150, 1110, 390), "L")
-    tube(fr, "Trilho_Pedaleira_" + ("E" if s < 0 else "D"), (s * 230, 1095, 390), (s * 230, 1775, 390), "L")
+    tube(fr, "Trilho_Pedaleira_" + ("E" if s < 0 else "D"), (s * 230, 880, 390), (s * 230, 1775, 390), "L")
 block(fr, "Chapa_Pivo", -80, 620, 340, 80, 780, 350, M_PLATE)
 for s in (-1, 1):
     side = "E" if s < 0 else "D"
-    block(fr, "Suporte_Haste_" + side, min(s * 280, s * 330), 35, 330, max(s * 280, s * 330), 85, 350, M_PLATE)
+    block(fr, "Suporte_Haste_" + side, s * 280, 35, 330, s * 330, 85, 350, M_PLATE)
     cyl(fr, "Haste_Ligacao_" + side, (s * 310, 60, MZ + 13), (s * 310, 60, 317), 8, M_STEEL)
     ball(fr, "Terminal_Rotula_Sup_" + side, (s * 310, 60, 317), 13, M_STEEL)
 
+# ----------------------------------------------------------------------------
+# Seat: carriage (rail slide) -> four links (rotate) -> pan (counter-rotates,
+# stays level) -> back (reclines about the pan/back hinge C).
+# ----------------------------------------------------------------------------
+
+CARRO_O = (0.0, A_R[1], ZP + 35)
+carro_cd, _, carro = dc_child(mov_cd, "Carro_Banco", CARRO_O, O, slide=(0.0, SEAT_SLIDE, 0.0))
+ys, ye = A_R[1] - 60, A_F[1] + 60
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    tube(carro, "Carro_Banco_" + sd, (sx * 150, ys, ZP + 35), (sx * 150, ye, ZP + 35), "H")
+    for nm, a_pt in (("Tras", A_R), ("Diant", A_F)):
+        block(carro, "Mancal_Biela_%s_%s" % (nm, sd), sx * 140, a_pt[1] - 20, ZP + 50, sx * 160, a_pt[1] + 20, a_pt[2] + 12, M_PLATE)
+        pin(carro, "Pino_Mancal_%s_%s" % (nm, sd), (sx * 165, a_pt[1], a_pt[2]), 18)
+    pin(carro, "Pino_Trava_Trilho_" + sd, (sx * 150, ye - 25, ZP + 20), 22, 6)
+tube(carro, "Travessa_Carro_Banco", (-140, ys + 15, ZP + 35), (140, ys + 15, ZP + 35), "H")
+tube(carro, "Travessa_Carro_Banco_Diant", (-140, ye - 15, ZP + 35), (140, ye - 15, ZP + 35), "H")
+
+banco_wrap = None
+for nm, a_pt in (("Tras", A_R), ("Diant", A_F)):
+    for sx in (-1, 1):
+        sd = "E" if sx < 0 else "D"
+        b_pt = v_add(a_pt, v_sub(B_R1, A_R))
+        a3, b3 = (sx * 180, a_pt[1], a_pt[2]), (sx * 180, b_pt[1], b_pt[2])
+        bcd, _, bw = dc_child(carro_cd, "Biela_Banco_%s_%s" % (sd, nm), a3, CARRO_O, rot=LINK_ROT)
+        tube(bw, "Biela", v_sub(a3, v_mul(v_norm(v_sub(b3, a3)), 15)), v_add(b3, v_mul(v_norm(v_sub(b3, a3)), 15)), "H",
+             up=(0, -math.sin(TH1), math.cos(TH1)), m=M_LINK)
+        if nm == "Tras" and sd == "E":
+            # The pan hangs from this link's top pivot and counter-rotates, so it
+            # translates exactly as the parallelogram dictates.
+            banco_cd, _, banco_wrap = dc_child(bcd, "Banco", b3, a3, rot=-LINK_ROT)
+            BANCO_O = b3
+
+C1 = F1["C"]
+seat = banco_wrap  # level sub-frame: rails, hinge posts, lock sectors and the shifter
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    rb, rf, rc = (sx * 262, B_R1[1], B_R1[2]), (sx * 262, B_F1[1], B_F1[2]), (sx * 262, C1[1], C1[2])
+    tube(seat, "Longarina_Subchassi_" + sd, v_sub(rb, v_mul(P_SUB, 25)), v_add(rf, v_mul(P_SUB, 25)), "H", up=N_SUB)
+    tube(seat, "Montante_Articulacao_" + sd, rb, rc, "H", up=N_SUB)
+    for b_pt in (B_R1, B_F1):
+        pin(seat, "Pino_Biela_" + sd, (sx * 221, b_pt[1], b_pt[2]), 45)
+    cyl(seat, "Setor_Trava_Assento_" + sd, (sx * 274, C1[1], C1[2]), (sx * 278, C1[1], C1[2]), 70, M_PLATE, 20)
+    cyl(seat, "Setor_Trava_Encosto_" + sd, (sx * 280, C1[1], C1[2]), (sx * 284, C1[1], C1[2]), 80, M_PLATE, 20)
+pin(seat, "Eixo_Articulacao_Banco", C1, 290, 10)
+
+# Driving Force Shifter on a bracket bolted to the right sub-frame rail, so it
+# rides with the seat and stays level in both postures.
+sh_o = v_add(v_sub(v_add(C1, v_mul(P_SUB, 150)), v_mul(N_SUB, 40)), (360.0, 0.0, 0.0))
+tube(seat, "Suporte_Cambio", (272.0, sh_o[1], sh_o[2] - 15), (295.0, sh_o[1], sh_o[2] - 15), "H")
+block(seat, "Chapa_Cambio", 295, sh_o[1] - 95, sh_o[2] - 30, 435, sh_o[1] + 95, sh_o[2], M_PLATE)
+shf = named_component(seat, "G920_Cambio")
+block(shf, "Carcaca", 360 - SHIFTER_W / 2, sh_o[1] - SHIFTER_D / 2, sh_o[2], 360 + SHIFTER_W / 2, sh_o[1] + SHIFTER_D / 2, sh_o[2] + 70, M_MOTOR)
+cyl(shf, "Alavanca", (360.0, sh_o[1], sh_o[2] + 70), (360.0, sh_o[1], sh_o[2] + SHIFTER_H - 25), 7, M_STEEL)
+ball(shf, "Manopla", (360.0, sh_o[1], sh_o[2] + SHIFTER_H - 22), 22, M_CARB)
+
+# Pan: hinged at C, follows the thigh in F1 (25 deg) and returns to 9 deg for the truck.
+P1, N1 = sag(POSE_F1["pan"]), sag(POSE_F1["pan"] + 90)
+_, _, assento = dc_child(banco_cd, "Assento", C1, BANCO_O, rot=PAN_ROT)
+oblock(assento, "Assento_Estofado", C1, X, P1, N1, (-240, 0, -60, 240, 440, 0), M_SEAT)
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    oblock(assento, "Aba_Assento_" + sd, C1, X, P1, N1, (min(sx * 200, sx * 250), 30, 0, max(sx * 200, sx * 250), 380, 55), M_BOLST)
+    pin(assento, "Pino_Trava_Assento_" + sd, v_add((sx * 268, C1[1], C1[2]), v_mul(P1, 50)), 8, 6)
+
+# Back: lower (lumbar) segment reclines about C; the upper segment hinges at
+# clavicle height (J, the F1 shoulder line projected on the back) and counter-
+# rotates, so it always sits at HEADREST_DEG: a racing-shell shoulder/head
+# support in F1, a straight high back in the truck.
+back_dir, back_n = sag(POSE_F1["torso"]), v_cross(X, sag(POSE_F1["torso"]))  # back_n points rearwards
+D_J = v_dot(v_sub(F1["S"], C1), back_dir)
+J = v_add(C1, v_mul(back_dir, D_J))
+enc_cd, _, encosto = dc_child(banco_cd, "Encosto", C1, BANCO_O, rot=BACK_ROT)
+oblock(encosto, "Encosto_Lombar", C1, X, back_dir, back_n, (-240, 0, 0, 240, D_J, 60), M_SEAT)
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    oblock(encosto, "Aba_Encosto_" + sd, C1, X, back_dir, back_n, (min(sx * 200, sx * 250), 70, -65, max(sx * 200, sx * 250), D_J - 30, 0), M_BOLST)
+    pin(encosto, "Pino_Trava_Encosto_" + sd, v_add((sx * 287, C1[1], C1[2]), v_mul(back_dir, 60)), 6, 6)
+    cyl(encosto, "Setor_Trava_Apoio_Superior_" + sd, (sx * 252, J[1], J[2]), (sx * 258, J[1], J[2]), 60, M_PLATE, 20)
+pin(encosto, "Eixo_Articulacao_Apoio_Superior", J, 262, 9)
+
+hr_dir, hr_n = sag(HEADREST_DEG), v_cross(X, sag(HEADREST_DEG))
+_, _, apoio = dc_child(enc_cd, "Encosto_Superior", J, C1, rot=-BACK_ROT)
+oblock(apoio, "Apoio_Ombros_Cabeca", J, X, hr_dir, hr_n, (-240, 0, 0, 240, 430, 60), M_SEAT)
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    oblock(apoio, "Aba_Ombro_" + sd, J, X, hr_dir, hr_n, (min(sx * 245, sx * 275), 0, -90, max(sx * 245, sx * 275), 160, 0), M_BOLST)
+    oblock(apoio, "Aba_Cabeca_" + sd, J, X, hr_dir, hr_n, (min(sx * 112, sx * 142), 250, -100, max(sx * 112, sx * 142), 430, 0), M_BOLST)
+    pin(apoio, "Pino_Trava_Apoio_Superior_" + sd, v_add((sx * 255, J[1], J[2]), v_mul(hr_dir, 50)), 8, 6)
+
+f1, s1 = F1["legs"]["D"]["f"], F1["legs"]["D"]["s"]
+ms1 = v_mul(s1, -1)
+Ph1 = F1["Ph"]
+pc_o = (0.0, PED_P[1], ZP + 35)
+pcarro_cd, _, pcarro = dc_child(mov_cd, "Carro_Pedaleira", pc_o, O, slide=(0.0, PED_SLIDE, 0.0))
+pys, pye = PED_P[1] - 90, PED_P[1] + 140
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    tube(pcarro, "Carro_Pedaleira_" + sd, (sx * 230, pys, ZP + 35), (sx * 230, pye, ZP + 35), "H")
+    tube(pcarro, "Torre_Pivo_Pedaleira_" + sd, (sx * 230, PED_P[1], ZP + 50), (sx * 230, PED_P[1], PED_P[2] + 20), "H", up=(0, 1, 0))
+    cyl(pcarro, "Setor_Trava_Pedaleira_" + sd, (sx * 241, PED_P[1], PED_P[2]), (sx * 247, PED_P[1], PED_P[2]), 60, M_PLATE, 20)
+    pin(pcarro, "Pino_Trava_Trilho_Ped_" + sd, (sx * 230, pye - 25, ZP + 20), 22, 6)
+tube(pcarro, "Travessa_Carro_Pedaleira", (-220, pys + 15, ZP + 35), (220, pys + 15, ZP + 35), "H")
+pin(pcarro, "Eixo_Pivo_Pedaleira", PED_P, 250, 9)
+
+_, _, deck = dc_child(pcarro_cd, "Pedaleira_Basculante", PED_P, pc_o, rot=PED_ALPHA)
+# Deck frame: origin at the heel point, ya = heel -> toe, za = from the pedal
+# unit towards the driver's sole. The mounting plate takes the G920 pedal unit
+# (bolted through its base); the pad faces sit at the sole plane (za ~ -8).
+DY0 = -60.0  # heel-rest edge of the pedal unit, along the sole
+oblock(deck, "Chapa_Fixacao_Pedais", Ph1, X, f1, ms1, (-218, DY0 - 10, -(PEDAL_DEPTH + 8), 218, DY0 + G920_PED_D + 10, -PEDAL_DEPTH), M_PLATE)
+ped = named_component(deck, "G920_Pedais")
+xc = 0.5 * (F1["legs"]["E"]["heel"][0] + F1["legs"]["D"]["heel"][0])
+oblock(ped, "Carcaca", Ph1, X, f1, ms1, (xc - G920_PED_W / 2, DY0, -PEDAL_DEPTH, xc + G920_PED_W / 2, DY0 + G920_PED_D, -PEDAL_DEPTH + 55), M_MOTOR)
+oblock(ped, "Apoio_Calcanhar", Ph1, X, f1, ms1, (xc - 190, DY0, -PEDAL_DEPTH + 55, xc + 190, DY0 + 70, -PEDAL_DEPTH + 75), M_CARB)
+for nm, px in (("Embreagem", xc - G920_PAD_PITCH), ("Freio", xc), ("Acelerador", xc + G920_PAD_PITCH)):
+    oblock(ped, "Pedal_" + nm, Ph1, X, f1, ms1, (px - 37, 85, -24, px + 37, 245, -8), M_PED)
+    tube(ped, "Haste_Pedal_" + nm, local_to_world(Ph1, X, f1, ms1, (px, 165, -24)),
+         local_to_world(Ph1, X, f1, ms1, (px, 225, -PEDAL_DEPTH + 55)), "H", up=f1, size=(18.0, 12.0), m=M_STEEL)
+# deck arms hang from the pivot, outboard of the towers, and carry the plate
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    pv = (sx * 250, PED_P[1], PED_P[2])
+    lo = local_to_world(Ph1, X, f1, ms1, (sx * 250, DY0 + 20, -(PEDAL_DEPTH + 23)))
+    hi = local_to_world(Ph1, X, f1, ms1, (sx * 250, DY0 + G920_PED_D - 10, -(PEDAL_DEPTH + 23)))
+    tube(deck, "Braco_Pedaleira_Inf_" + sd, pv, lo, "H")
+    tube(deck, "Braco_Pedaleira_Sup_" + sd, pv, hi, "H")
+for nm, yy in (("Inf", DY0 + 20), ("Sup", DY0 + G920_PED_D - 10)):
+    tube(deck, "Travessa_Pedaleira_" + nm, local_to_world(Ph1, X, f1, ms1, (-260, yy, -(PEDAL_DEPTH + 23))),
+         local_to_world(Ph1, X, f1, ms1, (260, yy, -(PEDAL_DEPTH + 23))), "H", up=ms1)
+
+# ----------------------------------------------------------------------------
+# Steering: mast (rail slide) -> arm carrying the G920 table (rotates about
+# Q_PIV). One rim serves both postures; only its angle and position change.
+# ----------------------------------------------------------------------------
+
+W1, n1, eu1 = F1["W"], F1["n"], F1["eu"]
+mast_o = (0.0, Q_PIV[1], ZP)
+mast_cd, _, mast = dc_child(mov_cd, "Mastro_Volante", mast_o, O, slide=(0.0, MAST_SLIDE, 0.0))
+qy, qz = Q_PIV[1], Q_PIV[2]
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    block(mast, "Abracadeira_Trilho_" + sd, sx * 255, qy - 35, 380, sx * 285, qy + 35, 396, M_PLATE)
+    tube(mast, "Coluna_Volante_" + sd, (sx * 270, qy, 396), (sx * 270, qy, qz + 15), "H", up=(0, 1, 0))
+    pin(mast, "Pino_Trava_Trilho_Vol_" + sd, (sx * 290, qy + 20, 388), 12, 6)
+    block(mast, "Mancal_Braco_" + sd, sx * 52, qy - 22, qz - 15, sx * 64, qy + 22, qz + 25, M_PLATE)
+    cyl(mast, "Setor_Trava_Volante_" + sd, (sx * 66, qy, qz), (sx * 72, qy, qz), 55, M_PLATE, 20)
+tube(mast, "Travessa_Volante", (-260, qy, qz), (260, qy, qz), "H")
+pin(mast, "Eixo_Pivo_Volante", Q_PIV, 75, 9)
+
+arm_cd, _, arm = dc_child(mast_cd, "Braco_Volante", Q_PIV, mast_o, rot=WHEEL_ALPHA)
+# The G920 base bolts flat on a table; the rim plane is fixed relative to the
+# base, so tilting the table tilts the rim. F1 table frame = world axes, rotated
+# so that the rim plane sits at the F1 angle.
+tilt0 = POSE_F1["wheel_tilt"] - G920_WHEEL_PLANE
+tY, tZ = sag(tilt0), sag(tilt0 + 90)
+BASE_DROP = 135.0  # wheel centre -> underside of the G920 base
+mesa_o = v_sub(W1, v_mul(tZ, BASE_DROP))
+oblock(arm, "Mesa_Volante", mesa_o, X, tY, tZ, (-150, 45, -8, 150, 285, 0), M_PLATE)
+g920 = named_component(arm, "G920_Volante")
+oblock(g920, "Base_Motor", mesa_o, X, tY, tZ, (-130, 30, 0, 130, 262, 170), M_MOTOR)
+oblock(g920, "Tampa", mesa_o, X, tY, tZ, (-95, 60, 170, 95, 240, 190), M_CARB)
+for sx in (-1, 1):
+    cyl(g920, "Grampo_Mesa", local_to_world(mesa_o, X, tY, tZ, (sx * 105, 200, -8)),
+        local_to_world(mesa_o, X, tY, tZ, (sx * 105, 200, -60)), 12, M_CARB, 12)
+torus(g920, "Aro", W1, X, eu1, n1, G920_RIM_R, 14.0, M_WHEEL)
+cyl(g920, "Cubo", v_add(W1, v_mul(n1, 18)), local_to_world(mesa_o, X, tY, tZ, (0, 40, BASE_DROP)), 42, M_CARB)
+for ang in (0, 180, 270):
+    a = math.radians(ang)
+    d2 = v_add(v_mul(X, math.cos(a)), v_mul(eu1, math.sin(a)))
+    tube(g920, "Raio", v_add(v_mul(d2, 35), W1), v_add(v_mul(d2, G920_RIM_R - 5), W1), "H", up=n1, size=(30.0, 14.0), m=M_CARB)
+for sx in (-1, 1):
+    oblock(g920, "Borboleta_" + ("E" if sx < 0 else "D"), v_sub(W1, v_mul(n1, 25)), X, eu1, n1,
+           (sx * 60, -10, -6, sx * 115, 45, 0), M_STEEL)
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    for k, ly in (("Diant", 70), ("Tras", 260)):
+        tube(arm, "Braco_Volante_%s_%s" % (k, sd), local_to_world(mesa_o, X, tY, tZ, (sx * 40, ly, -8)), (sx * 40, qy, qz), "H", up=(1, 0, 0))
+
 # ============================================================================
-# Mannequin (articulated "rigged" figure, ~173 cm standing)
-# Segments are component definitions with a nominal length of 1000 mm; each
-# instance is stretched along its local Z to the real bone length.
+# Mannequins (articulated "rigged" figure, ~173 cm standing). One per posture,
+# shown only when the mechanism is fully in that posture.
 # ============================================================================
 
 NOM = 1000.0
 
-def get_def(name):
-    for d in model.get_component_definitions():
-        if d.get_name() == name:
-            return d, False
+def make_def(name, profile, m, n=16):
     cd = ComponentDefinition()
     cd.set_name(name)
     model.add_component_definitions([cd])
-    return cd, True
-
-def make_def(name, profile, m, n=16):
-    cd, new = get_def(name)
-    if new:
-        cd.get_entities().fill(lofted(profile, n), weld_vertices=True)
-        soften(cd.get_entities())
-        paint(cd.get_entities(), m)
+    cd.get_entities().fill(lofted(profile, n), weld_vertices=True)
+    soften(cd.get_entities())
+    paint(cd.get_entities(), m)
     return cd
 
 D_THIGH = make_def("Manequim_Coxa", [(0, 60), (150, 66), (700, 52), (1000, 46)], M_BONE)
@@ -392,10 +848,6 @@ D_TORSO = make_def("Manequim_Tronco", [(0, 110), (120, 126), (400, 104), (650, 1
 D_NECK = make_def("Manequim_Pescoco", [(0, 38), (1000, 36)], M_BONE)
 D_HEAD = make_def("Manequim_Cabeca", [(h - 100, r) for (h, r) in sphere_profile(100, 10)], M_BONE, 20)
 D_JOINT = make_def("Manequim_Articulacao", [(h - 50, r) for (h, r) in sphere_profile(50)], M_JOINT)
-
-# Anthropometry (mm) for a 170-175 cm adult.
-THIGH, SHANK, TORSO, UPPER_ARM, FOREARM_TO_GRIP = 420.0, 420.0, 520.0, 300.0, 310.0
-HIP_HALF_WIDTH, SHOULDER_HALF_WIDTH = 90.0, 195.0
 
 def bone(parent, cd, name, a, b, sx=1.0, sy=1.0):
     """Instance of a segment definition stretched from joint a to joint b."""
@@ -416,177 +868,95 @@ def joint(parent, name, c, r, cd=None, sz=1.0):
     inst.set_transform(frame_tf(c, (1, 0, 0), (0, 1, 0), (0, 0, 1), s, s, s * sz))
     parent.get_entities().add_instance(inst)
 
-# ============================================================================
-# Seating configuration builder
-# Every adjustable part (seat, pedal box, steering mast) is derived from the
-# mannequin's posture, so changing an angle below moves the hardware with it.
-# ============================================================================
-
-def build_config(c):
-    rep = {}
-    X = (1.0, 0.0, 0.0)
-    grp = new_group(mov, c["name"])
-    Hc = (0.0, c["hip"][0], ZP + c["hip"][1])  # hip-joint centre
-
-    # --- posture (forward kinematics in the sagittal plane) ---
-    tdir = sag(c["torso"])
-    S = v_add(Hc, v_mul(tdir, TORSO))  # shoulder line centre
-    legs = {}
-    for side, sx in (("E", -1), ("D", 1)):
-        hx, kx, ax = sx * HIP_HALF_WIDTH, sx * c["knee_x"], c["ankle_x"][side]
-        th = math.radians(c["thigh"])
-        ps = math.radians(c["thigh"] - (180 - c["knee"]))
-        lt = math.sqrt(THIGH ** 2 - (kx - hx) ** 2)  # in-plane length keeps the 3D length exact
-        ls = math.sqrt(SHANK ** 2 - (ax - kx) ** 2)
-        hip = (hx, Hc[1], Hc[2])
-        K = (kx, hip[1] + lt * math.cos(th), hip[2] + lt * math.sin(th))
-        A = (ax, K[1] + ls * math.cos(ps), K[2] + ls * math.sin(ps))
-        f = sag(math.degrees(ps) + 180 - c["ankle"])  # heel -> toe direction
-        s = (0.0, f[2], -f[1])                          # sole normal (towards the pedal)
-        heel = v_add(A, v_add(v_mul(s, 70), v_mul(f, -50)))
-        legs[side] = dict(hip=hip, K=K, A=A, f=f, s=s, heel=heel)
-
-    tw_ = math.radians(c["wheel_tilt"])  # wheel plane angle from horizontal
-    n = (0.0, -math.sin(tw_), math.cos(tw_))  # wheel axis, pointing at the driver
-    eu = (0.0, math.cos(tw_), math.sin(tw_))  # "12 o'clock" direction in the wheel plane
-    W = v_add(S, (0.0, c["wheel_off"][0], c["wheel_off"][1]))
-    R, g = c["wheel_r"], math.radians(c["grip"])
-    grips = {"E": v_add(W, v_add(v_mul(X, -R * math.sin(g)), v_mul(eu, R * math.cos(g)))),
-             "D": v_add(W, v_add(v_mul(X, R * math.sin(g)), v_mul(eu, R * math.cos(g))))}
-
-    # --- mannequin ---
-    man = new_group(grp, "Manequim_" + c["tag"] + "_172cm")
+def build_mannequin(P, hide):
+    c = P["c"]
+    _, inst, man = dc_child(mov_cd, "Manequim_" + c["tag"], O, O, hide=hide)
+    Hc, S, tdir = P["Hc"], P["S"], P["tdir"]
     bone(man, D_TORSO, "Tronco", v_sub(Hc, v_mul(tdir, 75)), v_add(S, v_mul(tdir, 10)), 1.35, 0.75)
-    hc = v_add(S, (0.0, c["head"][0], c["head"][1]))
-    bone(man, D_NECK, "Pescoco", S, v_add(S, v_mul(v_sub(hc, S), 0.62)))
-    joint(man, "Cabeca", hc, 98, D_HEAD, 1.18)
+    bone(man, D_NECK, "Pescoco", S, v_add(S, v_mul(v_sub(P["head"], S), 0.62)))
+    joint(man, "Cabeca", P["head"], 98, D_HEAD, 1.18)
+    reach = {}
     for side, sx in (("E", -1), ("D", 1)):
-        L = legs[side]
+        L = P["legs"][side]
         joint(man, "Quadril_" + side, L["hip"], 58)
         bone(man, D_THIGH, "Coxa_" + side, L["hip"], L["K"])
         joint(man, "Joelho_" + side, L["K"], 48)
         bone(man, D_SHANK, "Canela_" + side, L["K"], L["A"])
         joint(man, "Tornozelo_" + side, L["A"], 37)
         oblock(man, "Pe_" + side, L["heel"], X, L["f"], v_mul(L["s"], -1), (-45, -10, 0, 45, 255, 80), M_BONE)
-        # Two-bone arm IK: shoulder -> hand on the wheel rim, elbow down and out.
-        P, T = (sx * SHOULDER_HALF_WIDTH, S[1], S[2]), grips[side]
-        dvec = v_sub(T, P)
+        # two-bone arm IK: shoulder -> hand on the wheel rim, elbow down and out
+        Psh, T = (sx * SHOULDER_HALF_WIDTH, S[1], S[2]), P["grips"][side]
+        dvec = v_sub(T, Psh)
         d = min(v_len(dvec), UPPER_ARM + FOREARM_TO_GRIP - 2)
         u = v_norm(dvec)
         pole = v_norm((sx * 0.6, -0.15, -1.0))
         pole = v_norm(v_sub(pole, v_mul(u, v_dot(pole, u))))
         a = (UPPER_ARM ** 2 - FOREARM_TO_GRIP ** 2 + d ** 2) / (2 * d)
-        E = v_add(P, v_add(v_mul(u, a), v_mul(pole, math.sqrt(max(UPPER_ARM ** 2 - a ** 2, 0.0)))))
-        joint(man, "Ombro_" + side, P, 46)
-        bone(man, D_UARM, "Braco_" + side, P, E)
+        E = v_add(Psh, v_add(v_mul(u, a), v_mul(pole, math.sqrt(max(UPPER_ARM ** 2 - a ** 2, 0.0)))))
+        joint(man, "Ombro_" + side, Psh, 46)
+        bone(man, D_UARM, "Braco_" + side, Psh, E)
         joint(man, "Cotovelo_" + side, E, 37)
         bone(man, D_FARM, "Antebraco_" + side, E, T)
         joint(man, "Mao_" + side, T, 40)
-        rep["alcance_" + side] = round(v_len(dvec), 1)
+        reach[side] = round(v_len(dvec))
+    return inst, reach
 
-    # --- seat: pan + reclining back, on a carriage that slides on the seat rails ---
-    al, be = math.radians(c["pan"]), math.radians(c["torso"])
-    p, npn = (0.0, math.cos(al), math.sin(al)), (0.0, -math.sin(al), math.cos(al))
-    b, nb = (0.0, math.cos(be), math.sin(be)), (0.0, math.sin(be), -math.cos(be))
-    # Corner C: hip joint sits 95 mm above the pan and 115 mm in front of the back.
-    r1, r2 = v_dot(npn, Hc) - 95, v_dot(nb, Hc) - 115
-    det = npn[1] * nb[2] - npn[2] * nb[1]
-    C = (0.0, (r1 * nb[2] - npn[2] * r2) / det, (npn[1] * r2 - r1 * nb[1]) / det)
-    seat = new_group(grp, "Banco_" + c["tag"])
-    bz = v_cross(X, b)
-    oblock(seat, "Assento", C, X, p, npn, (-240, 0, -60, 240, 440, 0), M_SEAT)
-    oblock(seat, "Encosto", C, X, b, bz, (-240, 0, 0, 240, 590, 60), M_SEAT)
-    for sx in (-1, 1):
-        oblock(seat, "Aba_Assento", C, X, p, npn, (min(sx * 200, sx * 250), 30, 0, max(sx * 200, sx * 250), 380, 55), M_BOLST)
-        oblock(seat, "Aba_Encosto", C, X, b, bz, (min(sx * 200, sx * 250), 70, -65, max(sx * 200, sx * 250), 470, 0), M_BOLST)
-    PF = v_sub(v_add(C, v_mul(p, 400)), v_mul(npn, 60))
-    PR = v_sub(v_add(C, v_mul(p, 40)), v_mul(npn, 60))
-    BM = v_add(v_add(C, v_mul(b, 320)), v_mul(bz, 60))
-    ys, ye = min(PR[1], BM[1]) - 40, PF[1] + 40
-    for sx in (-1, 1):
-        sd = "E" if sx < 0 else "D"
-        tube(seat, "Carro_Banco_" + sd, (sx * 150, ys, 415), (sx * 150, ye, 415), "H")
-        for nm, pt in (("Coluna_Frontal", PF), ("Coluna_Traseira", PR), ("Coluna_Encosto", BM)):
-            if pt[2] - 430 > 12:
-                tube(seat, nm + "_" + sd, (sx * 150, pt[1], 430), (sx * 150, pt[1], pt[2]), "H", up=(0, 1, 0))
-        tube(seat, "Travamento_Diagonal_" + sd, (sx * 150, ye - 20, 430),
-             (sx * 150, BM[1] + 0.5 * (PR[1] - BM[1]), max(PR[2], BM[2]) - 15), "L", up=(1, 0, 0))
-    rep["folga_assento_carro_mm"] = round(PR[2] - 430, 1)
-
-    # --- pedal box: tilting base plate on height posts and a sliding carriage ---
-    ped = new_group(grp, "Pedaleira_" + c["tag"])
-    f, s = legs["D"]["f"], legs["D"]["s"]
-    ms = v_mul(s, -1)
-    Ph = (0.0, 0.5 * (legs["E"]["heel"][1] + legs["D"]["heel"][1]), 0.5 * (legs["E"]["heel"][2] + legs["D"]["heel"][2]))
-    off = c["pedal_off"]
-    oblock(ped, "Base_Pedais_Inclinavel", Ph, X, f, ms, (-235, -45, -(off + 10), 235, 285, -off), M_PLATE)
-    lx, rx = legs["E"]["heel"][0], legs["D"]["heel"][0]
-    for nm, px in (("Embreagem", lx), ("Freio", rx - 115), ("Acelerador", rx)):
-        oblock(ped, "Pedal_" + nm, Ph, X, f, ms, (px - 38, 70, -24, px + 38, 235, -8), M_PED)
-        tube(ped, "Braco_Pedal_" + nm, local_to_world(Ph, X, f, ms, (px, 140, -24)),
-             local_to_world(Ph, X, f, ms, (px, 15, -off)), "L", up=f, m=M_STEEL)
-        if nm == "Freio":
-            cyl(ped, "Celula_Carga_Freio", local_to_world(Ph, X, f, ms, (px, 200, -24)),
-                local_to_world(Ph, X, f, ms, (px, 250, -off)), 14, M_STEEL)
-    B0 = local_to_world(Ph, X, f, ms, (0, -40, -(off + 5)))
-    B1 = local_to_world(Ph, X, f, ms, (0, 280, -(off + 5)))
-    ys, ye = min(B0[1], B1[1]) - 60, min(max(B0[1], B1[1]) + 40, 1775)
-    for sx in (-1, 1):
-        sd = "E" if sx < 0 else "D"
-        tube(ped, "Carro_Pedaleira_" + sd, (sx * 230, ys, 415), (sx * 230, ye, 415), "H")
-        for nm, pt in (("Coluna_Inferior", B0), ("Coluna_Superior_Regulavel", B1)):
-            if pt[2] - 430 > 12:
-                tube(ped, nm + "_" + sd, (sx * 245, pt[1], 430), (sx * 245, pt[1], pt[2]), "H", up=(0, 1, 0))
-
-    # --- steering: wheel + direct-drive motor on a tilting plate, sliding mast ---
-    st = new_group(grp, "Volante_" + c["tag"])
-    vol = new_group(st, "Volante")
-    torus(vol, "Aro", W, X, eu, n, R, c["rim_r"], M_WHEEL)
-    cyl(vol, "Cubo", v_sub(W, v_mul(n, 10)), v_add(W, v_mul(n, 22)), 45, M_CARB)
-    for ang in c["spokes"]:
-        a = math.radians(ang)
-        d2 = v_add(v_mul(X, math.cos(a)), v_mul(eu, math.sin(a)))
-        tube(vol, "Raio", v_add(v_mul(d2, 35), W), v_add(v_mul(d2, R - 5), W), "H", up=n, size=(26.0, 14.0), m=M_CARB)
-    if c["tag"] == "F1":
-        oblock(vol, "Painel_Volante_F1", W, X, eu, n, (-115, -70, 5, 115, 45, 30), M_CARB)
-    M0, M1 = v_sub(W, v_mul(n, 22)), v_sub(W, v_mul(n, 225))
-    cyl(st, "Motor_Direct_Drive", M0, M1, 55, M_MOTOR)
-    Mm, mdir = v_mul(v_add(M0, M1), 0.5), v_mul(n, -1)
-    oblock(st, "Chapa_Fixacao_Motor_Inclinavel", Mm, X, mdir, eu, (-65, -95, -68, 65, 95, -56), M_PLATE)
-    if c["tag"] == "F1":
-        yc, zc = M1[1] + 40, M1[2] - 85
-    else:  # truck: crossbar ahead of the knees, motor passes between them
-        yc, zc = max(legs["E"]["K"][1], legs["D"]["K"][1]) + 190, M1[2] - 70
-    for sx in (-1, 1):
-        sd = "E" if sx < 0 else "D"
-        block(st, "Abracadeira_Trilho_" + sd, min(sx * 255, sx * 285), yc - 35, 380, max(sx * 255, sx * 285), yc + 35, 396, M_PLATE)
-        tube(st, "Coluna_Volante_" + sd, (sx * 270, yc, 396), (sx * 270, yc, zc + 15), "H", up=(0, 1, 0))
-        tube(st, "Suporte_Motor_" + sd, local_to_world(Mm, X, mdir, eu, (sx * 40, 0, -68)), (sx * 40, yc, zc + 15), "H", up=(1, 0, 0))
-    tube(st, "Travessa_Volante", (-260, yc, zc), (260, yc, zc), "H")
-
-    rep["quadril_y_z"] = [round(Hc[1]), round(Hc[2] - ZP)]
-    rep["ombro_y_z"] = [round(S[1]), round(S[2] - ZP)]
-    rep["volante_y_z"] = [round(W[1]), round(W[2] - ZP)]
-    rep["calcanhar_y_z"] = [round(Ph[1]), round(Ph[2] - ZP)]
-    rep["topo_cabeca_mm"] = round(hc[2] + 98 * 1.18)
-    return grp, rep
-
-# Angles in degrees (sagittal plane, from +Y towards +Z); positions in mm,
-# `hip` is (Y, height above ZP).
-CONFIG_F1 = dict(name="Config_F1", tag="F1", hip=(650.0, 235.0), torso=145.0, thigh=25.0, knee=145.0, ankle=100.0,
-                 knee_x=100.0, ankle_x={"E": -115.0, "D": 125.0}, pan=12.0, head=(-25.0, 220.0),
-                 wheel_off=(420.0, 60.0), wheel_tilt=80.0, wheel_r=140.0, rim_r=17.0, grip=90.0,
-                 spokes=(0, 180, 270), pedal_off=115.0)
-CONFIG_CAMINHAO = dict(name="Config_Caminhao", tag="Caminhao", hip=(700.0, 537.0), torso=105.0, thigh=5.0, knee=120.0,
-                       ankle=90.0, knee_x=130.0, ankle_x={"E": -130.0, "D": 135.0}, pan=6.0, head=(-10.0, 230.0),
-                       wheel_off=(415.0, -232.0), wheel_tilt=35.0, wheel_r=200.0, rim_r=15.0, grip=60.0,
-                       spokes=(0, 180, 270), pedal_off=65.0)
-
-g_f1, rep_f1 = build_config(CONFIG_F1)
-g_trk, rep_trk = build_config(CONFIG_CAMINHAO)
+man_f1, reach_f1 = build_mannequin(F1, "F1")
+man_trk, reach_trk = build_mannequin(TRK, "TRK")
+REPORT["alcance_mm"] = {"F1": reach_f1, "Caminhao": reach_trk}
 
 # ============================================================================
-# Tags (layers), style, scenes and opening camera
+# Cross-checks of the synthesis (truck pose reached by the mechanisms).
+# ============================================================================
+
+def ped_world(p, m):
+    q = rot_x(p, PED_P, PED_ALPHA * m)
+    return (q[0], q[1] + PED_SLIDE * m, q[2])
+
+def wheel_world(p, m):
+    q = rot_x(p, Q_PIV, WHEEL_ALPHA * m)
+    return (q[0], q[1] + MAST_SLIDE * m, q[2])
+
+deck_corners = [local_to_world(Ph1, X, f1, ms1, (0, yy, zz)) for yy in (DY0 - 10, DY0 + G920_PED_D + 10)
+                for zz in (-(PEDAL_DEPTH + 38), 0)]
+g920_pts = [local_to_world(mesa_o, X, tY, tZ, (xx, yy, zz)) for xx in (-130, -65, 0, 65, 130)
+            for yy in range(30, 263, 29) for zz in range(-8, 191, 25)]
+def seg_dist(p, a, b):
+    ab = v_sub(b, a)
+    t = max(0.0, min(1.0, v_dot(v_sub(p, a), ab) / v_dot(ab, ab)))
+    return v_len(v_sub(p, v_add(a, v_mul(ab, t))))
+
+rim_trk = [v_add(TRK["W"], v_add(v_mul(X, G920_RIM_R * math.cos(t)), v_mul(TRK["eu"], G920_RIM_R * math.sin(t))))
+           for t in [i * math.pi / 12 for i in range(24)]]
+min_knee = 1e9  # G920 base / rim vs truck thighs (r ~62) and knees (r 48)
+for L in TRK["legs"].values():
+    for p in g920_pts:
+        q = wheel_world(p, 1)
+        min_knee = min(min_knee, seg_dist(q, L["hip"], L["K"]) - 62, v_len(v_sub(q, L["K"])) - 48)
+    for q in rim_trk:
+        min_knee = min(min_knee, seg_dist(q, L["hip"], L["K"]) - 62 - 14)
+hr_front = v_mul(hr_n, -1)
+link_z = A_R[2] + (B_R1[2] - A_R[2]) * ((C1[1] + v_mul(N1, -60)[1]) - A_R[1]) / (B_R1[1] - A_R[1])
+REPORT["banco_F1"] = {
+    "articulacao_clavicula_mm_do_eixo": round(D_J),
+    "folga_cabeca_apoio_mm": round(v_dot(v_sub(F1["head"], J), hr_front) - 98),
+    "folga_tronco_apoio_mm": round(v_dot(v_sub(F1["S"], J), hr_front) - 62),
+    "folga_assento_biela_mm": round((C1[2] - 60 * N1[2]) - (link_z + 15)),
+    "folga_coxa_assento_mm": round(95 - 66),
+}
+REPORT["verificacao"] = {
+    "erro_calcanhar_cam_mm": round(v_len(v_sub(ped_world(Ph1, 1), TRK["Ph"])), 2),
+    "erro_volante_cam_mm": round(v_len(v_sub(wheel_world(W1, 1), TRK["W"])), 2),
+    "folga_G920_pernas_cam_mm": round(min_knee),
+    "base_pedais_z_min_cam_mm_acima_chassi": round(min(ped_world(p, 1)[2] for p in deck_corners) - ZP),
+    "carro_banco_y_min_max": [round(min(ys, ys + SEAT_SLIDE)), round(max(ye, ye + SEAT_SLIDE))],
+    "carro_pedal_y_min_max": [round(min(pys, pys + PED_SLIDE)), round(max(pye, pye + PED_SLIDE))],
+    "mastro_y_F1_cam": [round(qy), round(qy + MAST_SLIDE)],
+    "topo_cabeca_mm": {"F1": round(F1["head"][2] + 116), "Caminhao": round(TRK["head"][2] + 116)},
+}
+
+# ============================================================================
+# Tags, style, scenes and opening camera
 # ============================================================================
 
 def mk_layer(name):
@@ -598,11 +968,11 @@ def mk_layer(name):
     model.add_layers([l])
     return l
 
-L_EST, L_F1, L_TRK = mk_layer("Estrutura"), mk_layer("Config_F1"), mk_layer("Config_Caminhao")
-base.set_layer(L_EST)
-fr.set_layer(L_EST)
-g_f1.set_layer(L_F1)
-g_trk.set_layer(L_TRK)
+L_BASE, L_MOV, L_MAN = mk_layer("Plataforma_Base"), mk_layer("Plataforma_Movel"), mk_layer("Manequim")
+base.set_layer(L_BASE)
+mov_inst.set_layer(L_MOV)
+man_f1.set_layer(L_MAN)
+man_trk.set_layer(L_MAN)
 
 ro, si = model.get_rendering_options(), model.get_shadow_info()
 for k, v in {"EDGE_DISPLAY_MODE": TypedValue(int_value=1), "RENDER_MODE": TypedValue(int_value=2),
@@ -629,9 +999,8 @@ def cam(eye, tgt, fov):
 V_SIDE = ((-4200, 820, 850), (0, 820, 760), 32)
 V_34 = ((-2300, 3200, 1750), (0, 780, 600), 35)
 V_MECH = ((2000, -2200, 1150), (0, 450, 250), 35)
-scene_defs = [("F1 - 3/4", V_34, [L_TRK]), ("F1 - Lateral", V_SIDE, [L_TRK]),
-              ("Caminhao - 3/4", V_34, [L_F1]), ("Caminhao - Lateral", V_SIDE, [L_F1]),
-              ("Base e Atuadores", V_MECH, [L_F1, L_TRK])]
+scene_defs = [("Vista 3/4", V_34, []), ("Vista Lateral", V_SIDE, []),
+              ("Mecanismos (sem manequim)", V_SIDE, [L_MAN]), ("Base e Atuadores", V_MECH, [L_MOV, L_MAN])]
 scenes = []
 for name, _, _ in scene_defs:
     sc = Scene()
@@ -645,7 +1014,8 @@ for sc, (name, view, hidden) in zip(scenes, scene_defs):
     for l in hidden:
         sc.add_layer(l)  # add_layer HIDES the tag in that scene
 model.set_active_scene(scenes[0])
-L_TRK.set_visibility(False)  # opening view shows only the F1 configuration
 model.set_camera(cam(*V_34))
 
-result = {"F1": rep_f1, "Caminhao": rep_trk}
+apply_state(0.0)
+session_state["apply_state"] = apply_state
+result = REPORT
