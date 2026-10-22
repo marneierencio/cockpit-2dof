@@ -38,8 +38,10 @@
 #     Chassi_Movel (group)
 #     Carro_Banco (DC, slides)
 #       Biela_Banco_* (DC, rotate)      four-bar links
-#         Banco (DC, counter-rotates)   only under Biela_Banco_E_Tras
-#           Encosto (DC, reclines)
+#         Banco (DC, counter-rotates)   level sub-frame, only under Biela_Banco_E_Tras
+#           Assento (DC, tilts about C)        pan: follows the thigh in F1
+#           Encosto (DC, reclines about C)
+#             Encosto_Superior (DC)            shoulder/head shell, constant angle
 #     Carro_Pedaleira (DC, slides)
 #       Pedaleira_Basculante (DC, tilts)
 #     Mastro_Volante (DC, slides)
@@ -461,7 +463,7 @@ for s in (-1, 1):
 
 THIGH, SHANK, TORSO, UPPER_ARM, FOREARM_TO_GRIP = 420.0, 420.0, 520.0, 300.0, 310.0
 HIP_HALF_WIDTH, SHOULDER_HALF_WIDTH = 90.0, 195.0
-PAN_DEG = 9.0          # seat-pan angle, common to both postures (four-bar keeps it constant)
+SUB_DEG = 9.0          # seat sub-frame angle (the parallelogram keeps it constant)
 X = (1.0, 0.0, 0.0)
 
 # Logitech G920 / Driving Force Shifter (published overall sizes, mm). Internal
@@ -474,10 +476,12 @@ PEDAL_DEPTH = 130.0                 # sole (pad face) -> pedal-unit mounting fac
 SHIFTER_W, SHIFTER_D, SHIFTER_H = 130.0, 165.0, 167.0
 
 # Angles in degrees (sagittal plane); `hip` is (Y, height above ZP).
-POSE_F1 = dict(tag="F1", hip=(650.0, 290.0), torso=145.0, thigh=25.0, knee=145.0, ankle=100.0,
-               knee_x=100.0, ankle_x={"E": -115.0, "D": 125.0}, head=(-25.0, 220.0),
+# `pan` is the seat-pan angle; in F1 it matches the thigh so the pan carries it.
+# The F1 head rests on the upper back segment (see Encosto_Superior).
+POSE_F1 = dict(tag="F1", hip=(650.0, 290.0), torso=145.0, pan=25.0, thigh=25.0, knee=145.0, ankle=100.0,
+               knee_x=100.0, ankle_x={"E": -115.0, "D": 125.0}, head=(-40.0, 213.0),
                wheel_off=(420.0, 60.0), wheel_tilt=80.0, wheel_r=G920_RIM_R, grip=90.0)
-POSE_TRK = dict(tag="Caminhao", hip=(700.0, 597.0), torso=105.0, thigh=5.0, knee=120.0, ankle=90.0,
+POSE_TRK = dict(tag="Caminhao", hip=(700.0, 597.0), torso=105.0, pan=9.0, thigh=5.0, knee=120.0, ankle=90.0,
                 knee_x=130.0, ankle_x={"E": -115.0, "D": 125.0}, head=(-10.0, 230.0),
                 wheel_off=(460.0, -100.0), wheel_tilt=45.0, wheel_r=G920_RIM_R, grip=60.0)
 
@@ -510,7 +514,7 @@ def posture(c):
     grips = {"E": v_add(W, v_add(v_mul(X, -R * math.sin(g)), v_mul(eu, R * math.cos(g)))),
              "D": v_add(W, v_add(v_mul(X, R * math.sin(g)), v_mul(eu, R * math.cos(g))))}
     # seat corner C: hip 95 mm above the pan and 115 mm in front of the back
-    al, be = math.radians(PAN_DEG), math.radians(c["torso"])
+    al, be = math.radians(c["pan"]), math.radians(c["torso"])
     npn = (0.0, -math.sin(al), math.cos(al))
     nb = (0.0, math.sin(be), -math.cos(be))
     r1, r2 = v_dot(npn, Hc) - 95, v_dot(nb, Hc) - 115
@@ -537,11 +541,12 @@ def solve_pivot(p1, p2, alpha, pz):
     q = rot_x(p1, (0.0, py, pz), alpha)
     return (0.0, py, pz), p2[1] - q[1]
 
-# --- seat: parallelogram four-bar (pan angle constant) + carriage slide ---
-P_PAN, N_PAN = sag(PAN_DEG), sag(PAN_DEG + 90)
+# --- seat: parallelogram four-bar (level sub-frame) + carriage slide; the pan
+# and the back hinge on the sub-frame at C, so their angles are free ---
+P_SUB, N_SUB = sag(SUB_DEG), sag(SUB_DEG + 90)
 LINK = 360.0
-B_R1 = v_sub(v_add(F1["C"], v_mul(P_PAN, 70)), v_mul(N_PAN, 85))   # link top pivots under the pan
-B_F1 = v_sub(v_add(F1["C"], v_mul(P_PAN, 380)), v_mul(N_PAN, 85))
+B_R1 = v_sub(v_add(F1["C"], v_mul(P_SUB, 70)), v_mul(N_SUB, 85))   # link top pivots on the sub-frame
+B_F1 = v_sub(v_add(F1["C"], v_mul(P_SUB, 380)), v_mul(N_SUB, 85))
 TH1 = math.asin((B_R1[2] - (ZP + 65)) / LINK)                     # rear carriage pivot at ZP + 65
 DZ = TRK["C"][2] - F1["C"][2]
 TH2 = math.asin(math.sin(TH1) + DZ / LINK)
@@ -550,8 +555,11 @@ A_F = v_add(A_R, v_sub(B_F1, B_R1))
 SEAT_SLIDE = (TRK["C"][1] - F1["C"][1]) - LINK * (math.cos(TH2) - math.cos(TH1))
 LINK_ROT = math.degrees(TH2 - TH1)
 BACK_ROT = POSE_TRK["torso"] - POSE_F1["torso"]
+PAN_ROT = POSE_TRK["pan"] - POSE_F1["pan"]
+HEADREST_DEG = POSE_TRK["torso"]  # upper back segment keeps the truck back angle in both postures
 REPORT["banco"] = {"biela_graus_F1_cam": [round(math.degrees(TH1), 1), round(math.degrees(TH2), 1)],
-                   "curso_carro_mm": round(SEAT_SLIDE, 1), "reclinacao_graus": BACK_ROT}
+                   "curso_carro_mm": round(SEAT_SLIDE, 1), "reclinacao_graus": BACK_ROT,
+                   "giro_assento_graus": PAN_ROT}
 
 # --- pedal box: deck tilts about P on a carriage that slides ---
 PED_ALPHA = TRK["legs"]["D"]["phi"] - F1["legs"]["D"]["phi"]
@@ -668,42 +676,64 @@ for nm, a_pt in (("Tras", A_R), ("Diant", A_F)):
             # The pan hangs from this link's top pivot and counter-rotates, so it
             # translates exactly as the parallelogram dictates.
             banco_cd, _, banco_wrap = dc_child(bcd, "Banco", b3, a3, rot=-LINK_ROT)
+            BANCO_O = b3
 
 C1 = F1["C"]
-seat = banco_wrap
-oblock(seat, "Assento", C1, X, P_PAN, N_PAN, (-240, 0, -60, 240, 440, 0), M_SEAT)
+seat = banco_wrap  # level sub-frame: rails, hinge posts, lock sectors and the shifter
 for sx in (-1, 1):
     sd = "E" if sx < 0 else "D"
-    oblock(seat, "Aba_Assento_" + sd, C1, X, P_PAN, N_PAN, (min(sx * 200, sx * 250), 30, 0, max(sx * 200, sx * 250), 380, 55), M_BOLST)
+    rb, rf, rc = (sx * 262, B_R1[1], B_R1[2]), (sx * 262, B_F1[1], B_F1[2]), (sx * 262, C1[1], C1[2])
+    tube(seat, "Longarina_Subchassi_" + sd, v_sub(rb, v_mul(P_SUB, 25)), v_add(rf, v_mul(P_SUB, 25)), "H", up=N_SUB)
+    tube(seat, "Montante_Articulacao_" + sd, rb, rc, "H", up=N_SUB)
     for b_pt in (B_R1, B_F1):
-        top = v_add(b_pt, v_mul(N_PAN, 25))
-        block(seat, "Orelha_Biela_" + sd, sx * 190, b_pt[1] - 18, b_pt[2] - 12, sx * 200, b_pt[1] + 18, top[2], M_PLATE)
-        pin(seat, "Pino_Biela_" + sd, (sx * 185, b_pt[1], b_pt[2]), 15)
-    # recline lock sector (rides with the pan) + hinge pin at C
-    cyl(seat, "Setor_Trava_Encosto_" + sd, (sx * 252, C1[1], C1[2]), (sx * 258, C1[1], C1[2]), 70, M_PLATE, 20)
-pin(seat, "Eixo_Articulacao_Encosto", C1, 262, 10)
+        pin(seat, "Pino_Biela_" + sd, (sx * 221, b_pt[1], b_pt[2]), 45)
+    cyl(seat, "Setor_Trava_Assento_" + sd, (sx * 274, C1[1], C1[2]), (sx * 278, C1[1], C1[2]), 70, M_PLATE, 20)
+    cyl(seat, "Setor_Trava_Encosto_" + sd, (sx * 280, C1[1], C1[2]), (sx * 284, C1[1], C1[2]), 80, M_PLATE, 20)
+pin(seat, "Eixo_Articulacao_Banco", C1, 290, 10)
 
-# Driving Force Shifter on a bracket bolted to the right side of the pan, so it
+# Driving Force Shifter on a bracket bolted to the right sub-frame rail, so it
 # rides with the seat and stays level in both postures.
-sh_o = v_add(v_sub(v_add(C1, v_mul(P_PAN, 150)), v_mul(N_PAN, 40)), (360.0, 0.0, 0.0))
-tube(seat, "Suporte_Cambio", (250.0, sh_o[1], sh_o[2] - 15), (295.0, sh_o[1], sh_o[2] - 15), "H")
+sh_o = v_add(v_sub(v_add(C1, v_mul(P_SUB, 150)), v_mul(N_SUB, 40)), (360.0, 0.0, 0.0))
+tube(seat, "Suporte_Cambio", (272.0, sh_o[1], sh_o[2] - 15), (295.0, sh_o[1], sh_o[2] - 15), "H")
 block(seat, "Chapa_Cambio", 295, sh_o[1] - 95, sh_o[2] - 30, 435, sh_o[1] + 95, sh_o[2], M_PLATE)
 shf = named_component(seat, "G920_Cambio")
 block(shf, "Carcaca", 360 - SHIFTER_W / 2, sh_o[1] - SHIFTER_D / 2, sh_o[2], 360 + SHIFTER_W / 2, sh_o[1] + SHIFTER_D / 2, sh_o[2] + 70, M_MOTOR)
 cyl(shf, "Alavanca", (360.0, sh_o[1], sh_o[2] + 70), (360.0, sh_o[1], sh_o[2] + SHIFTER_H - 25), 7, M_STEEL)
 ball(shf, "Manopla", (360.0, sh_o[1], sh_o[2] + SHIFTER_H - 22), 22, M_CARB)
 
-back_dir, back_n = sag(POSE_F1["torso"]), v_cross(X, sag(POSE_F1["torso"]))
-_, _, encosto = dc_child(banco_cd, "Encosto", C1, (-180.0, B_R1[1], B_R1[2]), rot=BACK_ROT)
-oblock(encosto, "Encosto_Estofado", C1, X, back_dir, back_n, (-240, 0, 0, 240, 590, 60), M_SEAT)
+# Pan: hinged at C, follows the thigh in F1 (25 deg) and returns to 9 deg for the truck.
+P1, N1 = sag(POSE_F1["pan"]), sag(POSE_F1["pan"] + 90)
+_, _, assento = dc_child(banco_cd, "Assento", C1, BANCO_O, rot=PAN_ROT)
+oblock(assento, "Assento_Estofado", C1, X, P1, N1, (-240, 0, -60, 240, 440, 0), M_SEAT)
 for sx in (-1, 1):
-    oblock(encosto, "Aba_Encosto", C1, X, back_dir, back_n, (min(sx * 200, sx * 250), 70, -65, max(sx * 200, sx * 250), 470, 0), M_BOLST)
-    pin(encosto, "Pino_Trava_Encosto_" + ("E" if sx < 0 else "D"),
-        v_add((sx * 255, C1[1], C1[2]), v_mul(back_dir, 55)), 10, 6)
+    sd = "E" if sx < 0 else "D"
+    oblock(assento, "Aba_Assento_" + sd, C1, X, P1, N1, (min(sx * 200, sx * 250), 30, 0, max(sx * 200, sx * 250), 380, 55), M_BOLST)
+    pin(assento, "Pino_Trava_Assento_" + sd, v_add((sx * 268, C1[1], C1[2]), v_mul(P1, 50)), 8, 6)
 
-# ----------------------------------------------------------------------------
-# Pedal box: carriage (rail slide) -> tilting deck (rotates about PED_P).
-# ----------------------------------------------------------------------------
+# Back: lower (lumbar) segment reclines about C; the upper segment hinges at
+# clavicle height (J, the F1 shoulder line projected on the back) and counter-
+# rotates, so it always sits at HEADREST_DEG: a racing-shell shoulder/head
+# support in F1, a straight high back in the truck.
+back_dir, back_n = sag(POSE_F1["torso"]), v_cross(X, sag(POSE_F1["torso"]))  # back_n points rearwards
+D_J = v_dot(v_sub(F1["S"], C1), back_dir)
+J = v_add(C1, v_mul(back_dir, D_J))
+enc_cd, _, encosto = dc_child(banco_cd, "Encosto", C1, BANCO_O, rot=BACK_ROT)
+oblock(encosto, "Encosto_Lombar", C1, X, back_dir, back_n, (-240, 0, 0, 240, D_J, 60), M_SEAT)
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    oblock(encosto, "Aba_Encosto_" + sd, C1, X, back_dir, back_n, (min(sx * 200, sx * 250), 70, -65, max(sx * 200, sx * 250), D_J - 30, 0), M_BOLST)
+    pin(encosto, "Pino_Trava_Encosto_" + sd, v_add((sx * 287, C1[1], C1[2]), v_mul(back_dir, 60)), 6, 6)
+    cyl(encosto, "Setor_Trava_Apoio_Superior_" + sd, (sx * 252, J[1], J[2]), (sx * 258, J[1], J[2]), 60, M_PLATE, 20)
+pin(encosto, "Eixo_Articulacao_Apoio_Superior", J, 262, 9)
+
+hr_dir, hr_n = sag(HEADREST_DEG), v_cross(X, sag(HEADREST_DEG))
+_, _, apoio = dc_child(enc_cd, "Encosto_Superior", J, C1, rot=-BACK_ROT)
+oblock(apoio, "Apoio_Ombros_Cabeca", J, X, hr_dir, hr_n, (-240, 0, 0, 240, 430, 60), M_SEAT)
+for sx in (-1, 1):
+    sd = "E" if sx < 0 else "D"
+    oblock(apoio, "Aba_Ombro_" + sd, J, X, hr_dir, hr_n, (min(sx * 245, sx * 275), 0, -90, max(sx * 245, sx * 275), 160, 0), M_BOLST)
+    oblock(apoio, "Aba_Cabeca_" + sd, J, X, hr_dir, hr_n, (min(sx * 112, sx * 142), 250, -100, max(sx * 112, sx * 142), 430, 0), M_BOLST)
+    pin(apoio, "Pino_Trava_Apoio_Superior_" + sd, v_add((sx * 255, J[1], J[2]), v_mul(hr_dir, 50)), 8, 6)
 
 f1, s1 = F1["legs"]["D"]["f"], F1["legs"]["D"]["s"]
 ms1 = v_mul(s1, -1)
@@ -905,6 +935,15 @@ for L in TRK["legs"].values():
         min_knee = min(min_knee, seg_dist(q, L["hip"], L["K"]) - 62, v_len(v_sub(q, L["K"])) - 48)
     for q in rim_trk:
         min_knee = min(min_knee, seg_dist(q, L["hip"], L["K"]) - 62 - 14)
+hr_front = v_mul(hr_n, -1)
+link_z = A_R[2] + (B_R1[2] - A_R[2]) * ((C1[1] + v_mul(N1, -60)[1]) - A_R[1]) / (B_R1[1] - A_R[1])
+REPORT["banco_F1"] = {
+    "articulacao_clavicula_mm_do_eixo": round(D_J),
+    "folga_cabeca_apoio_mm": round(v_dot(v_sub(F1["head"], J), hr_front) - 98),
+    "folga_tronco_apoio_mm": round(v_dot(v_sub(F1["S"], J), hr_front) - 62),
+    "folga_assento_biela_mm": round((C1[2] - 60 * N1[2]) - (link_z + 15)),
+    "folga_coxa_assento_mm": round(95 - 66),
+}
 REPORT["verificacao"] = {
     "erro_calcanhar_cam_mm": round(v_len(v_sub(ped_world(Ph1, 1), TRK["Ph"])), 2),
     "erro_volante_cam_mm": round(v_len(v_sub(wheel_world(W1, 1), TRK["W"])), 2),

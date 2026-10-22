@@ -20,7 +20,9 @@ Shifter**.
 - Estrutura em **tubo 20×30** nas regiões de maior esforço e **tubo
   10×20** nas de menor esforço.
 - **Mecanismos de ajuste:**
-  - banco em quadrilátero articulado com encosto reclinável;
+  - banco em quadrilátero articulado, com assento inclinável (apoia a
+    coxa no F1) e encosto reclinável com apoio superior de ombros/cabeça
+    articulado na clavícula (efeito de banco-concha no F1);
   - pedaleira basculante;
   - volante em braço pivotado.
 
@@ -32,15 +34,14 @@ Shifter**.
 Detalhes completos no **[Memorial Descritivo](docs/MEMORIAL-DESCRITIVO.md)**.
 
 > ⚠️ **Status: anteprojeto.** Não houve cálculo estrutural nem
-> dimensionamento dos motores, e os componentes dinâmicos ainda não foram
-> testados no SketchUp desktop. Leia a seção 12 do memorial antes de
-> fabricar.
+> dimensionamento dos motores. A animação foi testada no SketchUp desktop.
+> Leia a seção 12 do memorial antes de fabricar.
 
 ## Estrutura do repositório
 
 | Caminho | Conteúdo |
 |---|---|
-| `docs/MEMORIAL-DESCRITIVO.md` | Memorial descritivo (revisão R1) |
+| `docs/MEMORIAL-DESCRITIVO.md` | Memorial descritivo (revisão R2) |
 | `modelo/gerar_modelo.py` | Gerador paramétrico do modelo SketchUp (v2) |
 | `modelo/cockpit_2dof_ajustavel_G920.skp` | Modelo 3D v2 com componentes dinâmicos (enviado manualmente) |
 | `modelo/cockpit_simulador_F1_caminhao*.skp` | Modelos da R0 (duas configurações sobrepostas), mantidos como histórico |
