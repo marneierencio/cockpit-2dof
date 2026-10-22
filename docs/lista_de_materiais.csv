@@ -1,77 +1,75 @@
 codigo;conjunto;tipo;descricao;perfil;dimensoes_mm;comprimento_corte_mm;corte;massa_kg;especificacao
-B-T01;Plataforma-base;Tubo;Longarina base E;20x30;20x30 x 2050;2050;reto;2,961;
-B-T02;Plataforma-base;Tubo;Longarina base D;20x30;20x30 x 2050;2050;reto;2,961;
-B-T03;Plataforma-base;Tubo;Travessa base y-190;20x30;20x30 x 640;640;reto;0,924;
-B-T04;Plataforma-base;Tubo;Travessa base y-120;20x30;20x30 x 640;640;reto;0,924;
-B-T05;Plataforma-base;Tubo;Travessa base y40;20x30;20x30 x 640;640;reto;0,924;
-B-T06;Plataforma-base;Tubo;Travessa base y300;20x30;20x30 x 640;640;reto;0,924;
-B-T07;Plataforma-base;Tubo;Travessa base y560;20x30;20x30 x 640;640;reto;0,924;
-B-T08;Plataforma-base;Tubo;Travessa base y700;20x30;20x30 x 640;640;reto;0,924;
-B-T09;Plataforma-base;Tubo;Travessa base y840;20x30;20x30 x 640;640;reto;0,924;
-B-T10;Plataforma-base;Tubo;Travessa base y1100;20x30;20x30 x 640;640;reto;0,924;
-B-T11;Plataforma-base;Tubo;Travessa base y1700;20x30;20x30 x 640;640;reto;0,924;
-B-T12;Plataforma-base;Tubo;Travessa base y1840;20x30;20x30 x 640;640;reto;0,924;
-B-T13;Plataforma-base;Tubo;Diagonal base;10x20;10x20 x 1057;1057;angulo;0,549;
-B-T14;Plataforma-base;Tubo;Apoio motor E;20x30;20x30 x 140;140;reto;0,202;
-B-T15;Plataforma-base;Tubo;Apoio motor D;20x30;20x30 x 140;140;reto;0,202;
-B-T16;Plataforma-base;Tubo;Perna torre pivo;20x30;20x30 x 264;264;angulo;0,381;
-B-T17;Plataforma-base;Tubo;Perna torre pivo;20x30;20x30 x 264;264;angulo;0,381;
-B-T18;Plataforma-base;Tubo;Perna torre pivo;20x30;20x30 x 264;264;angulo;0,381;
-B-T19;Plataforma-base;Tubo;Perna torre pivo;20x30;20x30 x 264;264;angulo;0,381;
-B-CH01;Plataforma-base;Chapa/peça usinada;Chapa topo torre pivo 160x160x15;;160 x 160 x 15;;;3,014;
+B-T01;Plataforma-base;Tubo;Longarina base E;20x30;20x30 x 2050;2050;reto;1,838;
+B-T02;Plataforma-base;Tubo;Longarina base D;20x30;20x30 x 2050;2050;reto;1,838;
+B-T03;Plataforma-base;Tubo;Travessa base y-190;20x30;20x30 x 640;640;reto;0,574;
+B-T04;Plataforma-base;Tubo;Travessa base y40;20x30;20x30 x 640;640;reto;0,574;
+B-T05;Plataforma-base;Tubo;Travessa base y300;20x30;20x30 x 640;640;reto;0,574;
+B-T06;Plataforma-base;Tubo;Travessa base y560;20x30;20x30 x 640;640;reto;0,574;
+B-T07;Plataforma-base;Tubo;Travessa base y840;20x30;20x30 x 640;640;reto;0,574;
+B-T08;Plataforma-base;Tubo;Travessa base y1100;20x30;20x30 x 640;640;reto;0,574;
+B-T09;Plataforma-base;Tubo;Travessa base y1700;20x30;20x30 x 640;640;reto;0,574;
+B-T10;Plataforma-base;Tubo;Travessa base y1840;20x30;20x30 x 640;640;reto;0,574;
+B-T11;Plataforma-base;Tubo;Diagonal base;10x20;10x20 x 1057;1057;angulo;0,549;
+B-T12;Plataforma-base;Tubo;Apoio motor E;20x30;20x30 x 140;140;reto;0,126;
+B-T13;Plataforma-base;Tubo;Apoio motor D;20x30;20x30 x 140;140;reto;0,126;
+B-T14;Plataforma-base;Tubo;Perna torre pivo;20x30;20x30 x 264;264;angulo;0,237;
+B-T15;Plataforma-base;Tubo;Perna torre pivo;20x30;20x30 x 264;264;angulo;0,237;
+B-T16;Plataforma-base;Tubo;Perna torre pivo;20x30;20x30 x 264;264;angulo;0,237;
+B-T17;Plataforma-base;Tubo;Perna torre pivo;20x30;20x30 x 264;264;angulo;0,237;
+B-CH01;Plataforma-base;Chapa/peça usinada;Chapa topo torre pivo 160x160x8;;160 x 160 x 8;;;1,608;
 B-CO01;Plataforma-base;Comprado;Garfo inferior cardan;;90 x 70 x 22;;;1,088;Junta cardan (cruzeta com rolamentos de agulha), capacidade estatica >= 20 kN
 B-CO02;Plataforma-base;Comprado;Orelha garfo inferior;;35 x 32 x 14;;;0,123;Junta cardan (cruzeta com rolamentos de agulha), capacidade estatica >= 20 kN
 B-CO03;Plataforma-base;Comprado;Orelha garfo inferior;;35 x 32 x 14;;;0,123;Junta cardan (cruzeta com rolamentos de agulha), capacidade estatica >= 20 kN
 B-CO04;Plataforma-base;Comprado;Cruzeta eixo Y (rolagem);;Ø26 x 120;;;0,500;Junta cardan (cruzeta com rolamentos de agulha), capacidade estatica >= 20 kN
-B-CH02;Plataforma-base;Chapa/peça usinada;Chapa suporte motor E;;177 x 120 x 10;;;1,667;
+B-CH02;Plataforma-base;Chapa/peça usinada;Chapa suporte motor 6mm E;;177 x 120 x 6;;;1,000;
 B-CO05;Plataforma-base;Comprado;Redutor planetario E;;Ø84 x 95;;;3,000;Redutor planetario 20:1 para NEMA 34 (flange 86 mm), torque nominal de saida >= 150 N.m
 B-CO06;Plataforma-base;Comprado;Motor de passo NEMA 34 E;;150 x 86 x 86;;;5,500;Motor de passo NEMA 34 12 N.m em malha fechada (ex.: 86HSE12N) + driver
 B-CH03;Plataforma-base;Chapa/peça usinada;Calco motor E;;87 x 60 x 20;;;0,820;
 B-PI01;Plataforma-base;Pino;Eixo saida redutor E;;Ø20 x 23;;;0,057;
-B-CH04;Plataforma-base;Chapa/peça usinada;Braco manivela 12mm E;;150 x 50 x 12;;;0,706;
+B-CH04;Plataforma-base;Chapa/peça usinada;Braco manivela 10mm E;;150 x 50 x 10;;;0,589;
 B-CO07;Plataforma-base;Comprado;Terminal rotular inferior E;;;;;0,072;Terminal rotular M16 (rod end)
-B-CH05;Plataforma-base;Chapa/peça usinada;Chapa suporte motor D;;177 x 120 x 10;;;1,667;
+B-CH05;Plataforma-base;Chapa/peça usinada;Chapa suporte motor 6mm D;;177 x 120 x 6;;;1,000;
 B-CO08;Plataforma-base;Comprado;Redutor planetario D;;Ø84 x 95;;;3,000;Redutor planetario 20:1 para NEMA 34 (flange 86 mm), torque nominal de saida >= 150 N.m
 B-CO09;Plataforma-base;Comprado;Motor de passo NEMA 34 D;;150 x 86 x 86;;;5,500;Motor de passo NEMA 34 12 N.m em malha fechada (ex.: 86HSE12N) + driver
 B-CH06;Plataforma-base;Chapa/peça usinada;Calco motor D;;87 x 60 x 20;;;0,820;
 B-PI02;Plataforma-base;Pino;Eixo saida redutor D;;Ø20 x 23;;;0,057;
-B-CH07;Plataforma-base;Chapa/peça usinada;Braco manivela 12mm D;;150 x 50 x 12;;;0,706;
+B-CH07;Plataforma-base;Chapa/peça usinada;Braco manivela 10mm D;;150 x 50 x 10;;;0,589;
 B-CO10;Plataforma-base;Comprado;Terminal rotular inferior D;;;;;0,072;Terminal rotular M16 (rod end)
-B-T20;Plataforma-base;Tubo;Coluna batente E;20x30;20x30 x 110;110;reto;0,159;
+B-T18;Plataforma-base;Tubo;Coluna batente E;20x30;20x30 x 110;110;reto;0,099;
 B-CO11;Plataforma-base;Comprado;Batente borracha E;;Ø48 x 35;;;0,100;Batente de borracha Ø48 x 35
-B-T21;Plataforma-base;Tubo;Coluna batente D;20x30;20x30 x 110;110;reto;0,159;
+B-T19;Plataforma-base;Tubo;Coluna batente D;20x30;20x30 x 110;110;reto;0,099;
 B-CO12;Plataforma-base;Comprado;Batente borracha D;;Ø48 x 35;;;0,100;Batente de borracha Ø48 x 35
 M-T01;Chassi móvel;Tubo;Longarina principal E;30x50;30x50 x 1780;1780;reto;2,602;
 M-T02;Chassi móvel;Tubo;Longarina principal D;30x50;30x50 x 1780;1780;reto;2,602;
 M-T03;Chassi móvel;Tubo;Travessa chassi y25;30x50;30x50 x 510;510;reto;0,746;
-M-T04;Chassi móvel;Tubo;Travessa chassi y300;20x30;20x30 x 510;510;reto;0,737;
+M-T04;Chassi móvel;Tubo;Travessa chassi y300;20x30;20x30 x 510;510;reto;0,457;
 M-T05;Chassi móvel;Tubo;Travessa chassi y650;30x50;30x50 x 510;510;reto;0,746;
 M-T06;Chassi móvel;Tubo;Travessa chassi y700;30x50;30x50 x 510;510;reto;0,746;
 M-T07;Chassi móvel;Tubo;Travessa chassi y750;30x50;30x50 x 510;510;reto;0,746;
-M-T08;Chassi móvel;Tubo;Travessa chassi y900;20x30;20x30 x 510;510;reto;0,737;
-M-T09;Chassi móvel;Tubo;Travessa chassi y1100;20x30;20x30 x 510;510;reto;0,737;
-M-T10;Chassi móvel;Tubo;Travessa chassi y1450;20x30;20x30 x 510;510;reto;0,737;
-M-T11;Chassi móvel;Tubo;Travessa chassi y1765;20x30;20x30 x 510;510;reto;0,737;
+M-T08;Chassi móvel;Tubo;Travessa chassi y900;20x30;20x30 x 510;510;reto;0,457;
+M-T09;Chassi móvel;Tubo;Travessa chassi y1100;20x30;20x30 x 510;510;reto;0,457;
+M-T10;Chassi móvel;Tubo;Travessa chassi y1450;20x30;20x30 x 510;510;reto;0,457;
+M-T11;Chassi móvel;Tubo;Travessa chassi y1765;20x30;20x30 x 510;510;reto;0,457;
 M-T12;Chassi móvel;Tubo;Diagonal piso y25-300;10x20;10x20 x 557;557;angulo;0,290;
 M-T13;Chassi móvel;Tubo;Diagonal piso y1100-1450;10x20;10x20 x 594;594;angulo;0,309;
-M-CH01;Chassi móvel;Chapa/peça usinada;Chapa pivo 300x140x16;;300 x 140 x 16;;;5,275;
+M-CH01;Chassi móvel;Chapa/peça usinada;Chapa pivo 300x140x8;;300 x 140 x 8;;;2,638;
 M-T14;Chassi móvel;Tubo;Banzo inferior soleira E y60-300;30x50;30x50 x 250;250;angulo;0,365;
 M-T15;Chassi móvel;Tubo;Banzo inferior soleira E y300-700;30x50;30x50 x 407;407;angulo;0,595;
-M-T16;Chassi móvel;Tubo;Banzo inferior soleira E y700-1100;30x50;30x50 x 426;426;angulo;0,622;
-M-T17;Chassi móvel;Tubo;Montante soleira E y60;20x30;20x30 x 10;10;reto;0,014;
-M-T18;Chassi móvel;Tubo;Montante soleira E y300;20x30;20x30 x 80;80;reto;0,116;
-M-T19;Chassi móvel;Tubo;Montante soleira E y700;20x30;20x30 x 155;155;reto;0,224;
-M-T20;Chassi móvel;Tubo;Montante soleira E y1100;20x30;20x30 x 10;10;reto;0,014;
-M-T21;Chassi móvel;Tubo;Diagonal soleira E y60-300;20x30;20x30 x 221;221;angulo;0,318;
-M-T22;Chassi móvel;Tubo;Diagonal soleira E y300-700;20x30;20x30 x 411;411;angulo;0,593;
-M-T23;Chassi móvel;Tubo;Diagonal soleira E y700-1100;20x30;20x30 x 411;411;angulo;0,593;
+M-T16;Chassi móvel;Tubo;Banzo inferior soleira E y700-1133;30x50;30x50 x 457;457;angulo;0,668;
+M-T17;Chassi móvel;Tubo;Montante soleira E y60;20x30;20x30 x 10;10;reto;0,009;
+M-T18;Chassi móvel;Tubo;Montante soleira E y300;20x30;20x30 x 80;80;reto;0,072;
+M-T19;Chassi móvel;Tubo;Montante soleira E y700;20x30;20x30 x 155;155;reto;0,139;
+M-T20;Chassi móvel;Tubo;Montante soleira E y1133;20x30;20x30 x 10;10;reto;0,009;
+M-T21;Chassi móvel;Tubo;Diagonal soleira E y60-300;20x30;20x30 x 221;221;angulo;0,197;
+M-T22;Chassi móvel;Tubo;Diagonal soleira E y300-700;20x30;20x30 x 411;411;angulo;0,368;
+M-T23;Chassi móvel;Tubo;Diagonal soleira E y700-1133;20x30;20x30 x 442;442;angulo;0,396;
 M-CH02;Chassi móvel;Chapa/peça usinada;Suporte haste traseira E;;50 x 45 x 20;;;0,353;
 M-CO01;Chassi móvel;Comprado;Haste ligacao E;;Ø16 x 124;;;0,196;Barra rosqueada M16 + porcas (entre rotulas)
 M-CO02;Chassi móvel;Comprado;Terminal rotular superior E;;;;;0,072;Terminal rotular M16 (rod end)
 M-CH03;Chassi móvel;Chapa/peça usinada;Suporte haste traseira D;;50 x 45 x 20;;;0,353;
 M-CO03;Chassi móvel;Comprado;Haste ligacao D;;Ø16 x 124;;;0,196;Barra rosqueada M16 + porcas (entre rotulas)
 M-CO04;Chassi móvel;Comprado;Terminal rotular superior D;;;;;0,072;Terminal rotular M16 (rod end)
-M-CO05;Chassi móvel;Comprado;Garfo superior cardan;;120 x 60 x 14;;;0,791;Junta cardan (cruzeta com rolamentos de agulha), capacidade estatica >= 20 kN
+M-CO05;Chassi móvel;Comprado;Garfo superior cardan;;120 x 60 x 22;;;1,243;Junta cardan (cruzeta com rolamentos de agulha), capacidade estatica >= 20 kN
 M-CO06;Chassi móvel;Comprado;Orelha garfo superior;;48 x 32 x 14;;;0,169;Junta cardan (cruzeta com rolamentos de agulha), capacidade estatica >= 20 kN
 M-CO07;Chassi móvel;Comprado;Orelha garfo superior;;48 x 32 x 14;;;0,169;Junta cardan (cruzeta com rolamentos de agulha), capacidade estatica >= 20 kN
 M-CO08;Chassi móvel;Comprado;Cruzeta eixo X (arfagem);;Ø26 x 120;;;0,500;Junta cardan (cruzeta com rolamentos de agulha), capacidade estatica >= 20 kN
@@ -79,30 +77,30 @@ M-T24;Chassi móvel;Tubo;Trilho banco E;30x50;30x50 x 1110;1110;reto;1,623;
 M-T25;Chassi móvel;Tubo;Trilho pedaleira E;30x50;30x50 x 1035;1035;reto;1,513;
 M-T26;Chassi móvel;Tubo;Trilho banco D;30x50;30x50 x 1110;1110;reto;1,623;
 M-T27;Chassi móvel;Tubo;Trilho pedaleira D;30x50;30x50 x 1035;1035;reto;1,513;
-BC-T01;Banco;Tubo;Longarina carro banco E;20x30;20x30 x 427;427;reto;0,616;
+BC-T01;Banco;Tubo;Longarina carro banco E;20x30;20x30 x 427;427;reto;0,382;
 BC-CH01;Banco;Chapa/peça usinada;Mancal biela tras E;;40 x 27 x 20;;;0,170;
 BC-PI01;Banco;Pino;Pino mancal biela tras E;;Ø16 x 30;;;0,047;Pino aco 1045 Ø16 x 30 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-CH02;Banco;Chapa/peça usinada;Mancal biela diant E;;75 x 40 x 20;;;0,474;
 BC-PI02;Banco;Pino;Pino mancal biela diant E;;Ø16 x 30;;;0,047;Pino aco 1045 Ø16 x 30 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-PI03;Banco;Pino;Pino indexador trilho banco E;;Ø12 x 60;;;0,053;Pino de trava rapida (ball lock) Ø12 x 60 mm com argola
-BC-T02;Banco;Tubo;Longarina carro banco D;20x30;20x30 x 427;427;reto;0,616;
+BC-T02;Banco;Tubo;Longarina carro banco D;20x30;20x30 x 427;427;reto;0,382;
 BC-CH03;Banco;Chapa/peça usinada;Mancal biela tras D;;40 x 27 x 20;;;0,170;
 BC-PI04;Banco;Pino;Pino mancal biela tras D;;Ø16 x 30;;;0,047;Pino aco 1045 Ø16 x 30 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-CH04;Banco;Chapa/peça usinada;Mancal biela diant D;;75 x 40 x 20;;;0,474;
 BC-PI05;Banco;Pino;Pino mancal biela diant D;;Ø16 x 30;;;0,047;Pino aco 1045 Ø16 x 30 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-PI06;Banco;Pino;Pino indexador trilho banco D;;Ø12 x 60;;;0,053;Pino de trava rapida (ball lock) Ø12 x 60 mm com argola
-BC-T03;Banco;Tubo;Travessa carro banco tras;20x30;20x30 x 280;280;reto;0,404;
-BC-T04;Banco;Tubo;Travessa carro banco diant;20x30;20x30 x 280;280;reto;0,404;
-BC-T05;Banco;Tubo;Biela banco E Tras;20x30;20x30 x 390;390;reto;0,563;
-BC-T06;Banco;Tubo;Biela banco D Tras;20x30;20x30 x 390;390;reto;0,563;
-BC-T07;Banco;Tubo;Biela banco E Diant;20x30;20x30 x 390;390;reto;0,563;
-BC-T08;Banco;Tubo;Biela banco D Diant;20x30;20x30 x 390;390;reto;0,563;
-BC-T09;Banco;Tubo;Longarina subchassi E;20x30;20x30 x 360;360;reto;0,520;
-BC-T10;Banco;Tubo;Montante articulacao E;20x30;20x30 x 119;119;angulo;0,170;
+BC-T03;Banco;Tubo;Travessa carro banco tras;20x30;20x30 x 280;280;reto;0,251;
+BC-T04;Banco;Tubo;Travessa carro banco diant;20x30;20x30 x 280;280;reto;0,251;
+BC-T05;Banco;Tubo;Biela banco E Tras;20x30;20x30 x 390;390;reto;0,350;
+BC-T06;Banco;Tubo;Biela banco D Tras;20x30;20x30 x 390;390;reto;0,350;
+BC-T07;Banco;Tubo;Biela banco E Diant;20x30;20x30 x 390;390;reto;0,350;
+BC-T08;Banco;Tubo;Biela banco D Diant;20x30;20x30 x 390;390;reto;0,350;
+BC-T09;Banco;Tubo;Longarina subchassi E;20x30;20x30 x 360;360;reto;0,323;
+BC-T10;Banco;Tubo;Montante articulacao E;20x30;20x30 x 119;119;angulo;0,106;
 BC-PI07;Banco;Pino;Pino biela subchassi E;;Ø16 x 90;;;0,142;Pino aco 1045 Ø16 x 90 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-PI08;Banco;Pino;Pino biela subchassi E;;Ø16 x 90;;;0,142;Pino aco 1045 Ø16 x 90 mm + 2 travas (anel elastico) + 2 buchas soldadas
-BC-T11;Banco;Tubo;Longarina subchassi D;20x30;20x30 x 360;360;reto;0,520;
-BC-T12;Banco;Tubo;Montante articulacao D;20x30;20x30 x 119;119;angulo;0,170;
+BC-T11;Banco;Tubo;Longarina subchassi D;20x30;20x30 x 360;360;reto;0,323;
+BC-T12;Banco;Tubo;Montante articulacao D;20x30;20x30 x 119;119;angulo;0,106;
 BC-PI09;Banco;Pino;Pino biela subchassi D;;Ø16 x 90;;;0,142;Pino aco 1045 Ø16 x 90 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-PI10;Banco;Pino;Pino biela subchassi D;;Ø16 x 90;;;0,142;Pino aco 1045 Ø16 x 90 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-PI11;Banco;Pino;Eixo articulacao assento/encosto;;Ø20 x 580;;;1,430;Pino aco 1045 Ø20 x 580 mm + 2 travas (anel elastico) + 2 buchas soldadas
@@ -111,84 +109,76 @@ BC-CO02;Banco;Comprado;Calco borracha apoio F1 diant E;;Ø28 x 117;;;0,050;Calco
 BC-CO03;Banco;Comprado;Calco borracha apoio F1 tras D;;Ø28 x 78;;;0,050;Calco de borracha Ø28 com parafuso (apoio do subchassi em F1)
 BC-CO04;Banco;Comprado;Calco borracha apoio F1 diant D;;Ø28 x 117;;;0,050;Calco de borracha Ø28 com parafuso (apoio do subchassi em F1)
 BC-ES01;Banco;Estofado;Assento estofado 480x440x60;;480 x 440 x 60;;;3,000;Assento estofado sobre base de compensado/aco
-BC-T13;Banco;Tubo;Quadro assento lateral E;20x30;20x30 x 410;410;reto;0,592;
-BC-T14;Banco;Tubo;Quadro assento lateral D;20x30;20x30 x 410;410;reto;0,592;
-BC-T15;Banco;Tubo;Quadro assento travessa inferior;20x30;20x30 x 440;440;reto;0,636;
-BC-T16;Banco;Tubo;Quadro assento travessa superior;20x30;20x30 x 440;440;reto;0,636;
+BC-T13;Banco;Tubo;Espinha assento;20x30;20x30 x 440;440;reto;0,395;
 BC-ES02;Banco;Estofado;Aba assento E;;350 x 55 x 50;;;0,400;
 BC-ES03;Banco;Estofado;Aba assento D;;350 x 55 x 50;;;0,400;
 BC-ES04;Banco;Estofado;Encosto lombar 480x563x60;;563 x 480 x 60;;;3,500;Encosto estofado sobre base de compensado/aco
-BC-T17;Banco;Tubo;Quadro encosto lateral E;20x30;20x30 x 534;534;reto;0,770;
-BC-T18;Banco;Tubo;Quadro encosto lateral D;20x30;20x30 x 534;534;reto;0,770;
-BC-T19;Banco;Tubo;Quadro encosto travessa inferior;20x30;20x30 x 440;440;reto;0,636;
-BC-T20;Banco;Tubo;Quadro encosto travessa superior;20x30;20x30 x 440;440;reto;0,636;
+BC-T14;Banco;Tubo;Espinha encosto;20x30;20x30 x 440;440;reto;0,395;
 BC-ES05;Banco;Estofado;Aba encosto E;;463 x 65 x 50;;;0,500;
 BC-ES06;Banco;Estofado;Aba encosto D;;463 x 65 x 50;;;0,500;
 BC-PI12;Banco;Pino;Eixo articulacao apoio superior;;Ø18 x 524;;;1,047;Pino aco 1045 Ø18 x 524 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-ES07;Banco;Estofado;Apoio ombros/cabeca 480x430x60;;480 x 430 x 60;;;2,500;Apoio estofado sobre base de compensado/aco
-BC-T21;Banco;Tubo;Quadro apoio superior lateral E;20x30;20x30 x 400;400;reto;0,578;
-BC-T22;Banco;Tubo;Quadro apoio superior lateral D;20x30;20x30 x 400;400;reto;0,578;
-BC-T23;Banco;Tubo;Quadro apoio superior travessa inferior;20x30;20x30 x 440;440;reto;0,636;
-BC-T24;Banco;Tubo;Quadro apoio superior travessa superior;20x30;20x30 x 440;440;reto;0,636;
+BC-T15;Banco;Tubo;Espinha apoio superior;20x30;20x30 x 440;440;reto;0,395;
 BC-ES08;Banco;Estofado;Aba ombro E;;160 x 90 x 30;;;0,400;
 BC-ES09;Banco;Estofado;Aba cabeca E;;180 x 100 x 30;;;0,300;
 BC-ES10;Banco;Estofado;Aba ombro D;;160 x 90 x 30;;;0,400;
 BC-ES11;Banco;Estofado;Aba cabeca D;;180 x 100 x 30;;;0,300;
-BC-T25;Banco;Tubo;Tirante paralelo apoio superior E;10x20;10x20 x 564;564;reto;0,293;
+BC-T16;Banco;Tubo;Tirante paralelo apoio superior E;10x20;10x20 x 564;564;reto;0,293;
 BC-CH05;Banco;Chapa/peça usinada;Orelha tirante subchassi E;;52 x 27 x 8;;;0,089;
 BC-CH06;Banco;Chapa/peça usinada;Orelha tirante apoio E;;40 x 30 x 8;;;0,075;
 BC-PI13;Banco;Pino;Pino tirante inferior E;;Ø12 x 24;;;0,021;Pino aco 1045 Ø12 x 24 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-PI14;Banco;Pino;Pino tirante superior E;;Ø12 x 24;;;0,021;Pino aco 1045 Ø12 x 24 mm + 2 travas (anel elastico) + 2 buchas soldadas
-BC-T26;Banco;Tubo;Tirante paralelo apoio superior D;10x20;10x20 x 564;564;reto;0,293;
+BC-T17;Banco;Tubo;Tirante paralelo apoio superior D;10x20;10x20 x 564;564;reto;0,293;
 BC-CH07;Banco;Chapa/peça usinada;Orelha tirante subchassi D;;52 x 27 x 8;;;0,089;
 BC-CH08;Banco;Chapa/peça usinada;Orelha tirante apoio D;;40 x 30 x 8;;;0,075;
 BC-PI15;Banco;Pino;Pino tirante inferior D;;Ø12 x 24;;;0,021;Pino aco 1045 Ø12 x 24 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-PI16;Banco;Pino;Pino tirante superior D;;Ø12 x 24;;;0,021;Pino aco 1045 Ø12 x 24 mm + 2 travas (anel elastico) + 2 buchas soldadas
 BC-CH09;Banco;Chapa/peça usinada;Alavanca encosto E (chapa 12x70);;175 x 70 x 12;;;1,154;
-BC-T27;Banco;Tubo;Haste comando encosto E;20x30;20x30 x 276;276;reto;0,397;
-BC-CH10;Banco;Chapa/peça usinada;Suporte haste encosto E;;42 x 40 x 12;;;0,157;
+BC-T18;Banco;Tubo;Haste comando encosto E;20x30;20x30 x 276;276;reto;0,247;
+BC-CH10;Banco;Chapa/peça usinada;Suporte haste encosto E;;41 x 40 x 12;;;0,156;
 BC-CH11;Banco;Chapa/peça usinada;Alavanca encosto D (chapa 12x70);;175 x 70 x 12;;;1,154;
-BC-T28;Banco;Tubo;Haste comando encosto D;20x30;20x30 x 276;276;reto;0,397;
-BC-CH12;Banco;Chapa/peça usinada;Suporte haste encosto D;;42 x 40 x 12;;;0,157;
+BC-T19;Banco;Tubo;Haste comando encosto D;20x30;20x30 x 276;276;reto;0,247;
+BC-CH12;Banco;Chapa/peça usinada;Suporte haste encosto D;;41 x 40 x 12;;;0,156;
 BC-CH13;Banco;Chapa/peça usinada;Orelha haste assento (chapa 12);;95 x 70 x 12;;;0,626;
-BC-T29;Banco;Tubo;Haste comando assento;20x30;20x30 x 292;292;reto;0,421;
+BC-T20;Banco;Tubo;Haste comando assento;20x30;20x30 x 292;292;reto;0,262;
 BC-CH14;Banco;Chapa/peça usinada;Suporte haste assento;;40 x 37 x 12;;;0,138;
-BC-T30;Banco;Tubo;Travessa carro banco haste encosto;20x30;20x30 x 280;280;reto;0,404;
-BC-T31;Banco;Tubo;Travessa carro banco haste assento;20x30;20x30 x 280;280;reto;0,404;
-BC-T32;Banco;Tubo;Tirante de arrasto do carro E;20x30;20x30 x 77;77;reto;0,111;
-BC-CH15;Banco;Chapa/peça usinada;Suporte tirante arrasto E;;136 x 24 x 20;;;0,511;
+BC-T21;Banco;Tubo;Travessa carro banco haste encosto;20x30;20x30 x 280;280;reto;0,251;
+BC-T22;Banco;Tubo;Travessa carro banco haste assento;20x30;20x30 x 280;280;reto;0,251;
+M-T28;Chassi móvel;Tubo;Travessa suporte tirante arrasto;20x30;20x30 x 510;510;reto;0,457;
+BC-T23;Banco;Tubo;Tirante de arrasto do carro E;20x30;20x30 x 68;68;reto;0,061;
+BC-CH15;Banco;Chapa/peça usinada;Suporte tirante arrasto E;;128 x 24 x 20;;;0,483;
 BC-PI17;Banco;Pino;Pino tirante arrasto na biela E;;Ø12 x 24;;;0,021;Pino aco 1045 Ø12 x 24 mm + 2 travas (anel elastico) + 2 buchas soldadas
-BC-T33;Banco;Tubo;Tirante de arrasto do carro D;20x30;20x30 x 77;77;reto;0,111;
-BC-CH16;Banco;Chapa/peça usinada;Suporte tirante arrasto D;;136 x 24 x 20;;;0,511;
+BC-T24;Banco;Tubo;Tirante de arrasto do carro D;20x30;20x30 x 68;68;reto;0,061;
+BC-CH16;Banco;Chapa/peça usinada;Suporte tirante arrasto D;;128 x 24 x 20;;;0,483;
 BC-PI18;Banco;Pino;Pino tirante arrasto na biela D;;Ø12 x 24;;;0,021;Pino aco 1045 Ø12 x 24 mm + 2 travas (anel elastico) + 2 buchas soldadas
-PE-T01;Pedaleira;Tubo;Longarina carro pedaleira E;20x30;20x30 x 230;230;reto;0,332;
-PE-T02;Pedaleira;Tubo;Torre pivo pedaleira E;20x30;20x30 x 90;90;reto;0,130;
+PE-T01;Pedaleira;Tubo;Longarina carro pedaleira E;20x30;20x30 x 230;230;reto;0,206;
+PE-T02;Pedaleira;Tubo;Torre pivo pedaleira E;20x30;20x30 x 90;90;reto;0,081;
 PE-PI01;Pedaleira;Pino;Pino indexador trilho pedaleira E;;Ø12 x 60;;;0,053;Pino de trava rapida (ball lock) Ø12 x 60 mm com argola
-PE-T03;Pedaleira;Tubo;Longarina carro pedaleira D;20x30;20x30 x 230;230;reto;0,332;
-PE-T04;Pedaleira;Tubo;Torre pivo pedaleira D;20x30;20x30 x 90;90;reto;0,130;
+PE-T03;Pedaleira;Tubo;Longarina carro pedaleira D;20x30;20x30 x 230;230;reto;0,206;
+PE-T04;Pedaleira;Tubo;Torre pivo pedaleira D;20x30;20x30 x 90;90;reto;0,081;
 PE-PI02;Pedaleira;Pino;Pino indexador trilho pedaleira D;;Ø12 x 60;;;0,053;Pino de trava rapida (ball lock) Ø12 x 60 mm com argola
-PE-T05;Pedaleira;Tubo;Travessa carro pedaleira;20x30;20x30 x 440;440;reto;0,636;
+PE-T05;Pedaleira;Tubo;Travessa carro pedaleira;20x30;20x30 x 440;440;reto;0,395;
 PE-PI03;Pedaleira;Pino;Eixo pivo pedaleira;;Ø18 x 490;;;0,979;Pino aco 1045 Ø18 x 490 mm + 2 travas (anel elastico) + 2 buchas soldadas
-PE-CH01;Pedaleira;Chapa/peça usinada;Chapa fixacao pedais 400x331x3;;400 x 331 x 3;;;3,118;
+PE-CH01;Pedaleira;Chapa/peça usinada;Chapa fixacao pedais 400x331x2;;400 x 331 x 2;;;2,079;
 PE-CO01;Pedaleira;Comprado;Pedais G920 (carcaca);;428 x 311 x 55;;;2,400;Logitech G920 - pedais (428,5 x 311 x 167 mm, 3,1 kg)
 PE-CO02;Pedaleira;Comprado;Pedais G920 (apoio calcanhar);;380 x 70 x 20;;;0,100;Logitech G920 - pedais (428,5 x 311 x 167 mm, 3,1 kg)
 PE-CO03;Pedaleira;Comprado;Pedais G920 (pedal embreagem);;160 x 74 x 16;;;0,200;Logitech G920 - pedais (428,5 x 311 x 167 mm, 3,1 kg)
 PE-CO04;Pedaleira;Comprado;Pedais G920 (pedal freio);;160 x 74 x 16;;;0,200;Logitech G920 - pedais (428,5 x 311 x 167 mm, 3,1 kg)
 PE-CO05;Pedaleira;Comprado;Pedais G920 (pedal acelerador);;160 x 74 x 16;;;0,200;Logitech G920 - pedais (428,5 x 311 x 167 mm, 3,1 kg)
-PE-T06;Pedaleira;Tubo;Braco pedaleira inferior E;20x30;20x30 x 298;298;angulo;0,429;
-PE-T07;Pedaleira;Tubo;Braco pedaleira superior E;20x30;20x30 x 526;526;angulo;0,758;
-PE-T08;Pedaleira;Tubo;Braco pedaleira inferior D;20x30;20x30 x 298;298;angulo;0,429;
-PE-T09;Pedaleira;Tubo;Braco pedaleira superior D;20x30;20x30 x 526;526;angulo;0,758;
-PE-T10;Pedaleira;Tubo;Travessa pedaleira inferior;20x30;20x30 x 400;400;reto;0,578;
-PE-T11;Pedaleira;Tubo;Travessa pedaleira superior;20x30;20x30 x 400;400;reto;0,578;
-PE-T12;Pedaleira;Tubo;Tubo de torcao pedaleira;20x30;20x30 x 360;360;reto;0,520;
-PE-T13;Pedaleira;Tubo;Alavanca haste pedaleira;20x30;20x30 x 240;240;reto;0,347;
-PE-T14;Pedaleira;Tubo;Haste comando pedaleira;20x30;20x30 x 207;207;reto;0,299;
+PE-T06;Pedaleira;Tubo;Braco pedaleira inferior E;20x30;20x30 x 298;298;angulo;0,267;
+PE-T07;Pedaleira;Tubo;Braco pedaleira superior E;20x30;20x30 x 526;526;angulo;0,471;
+PE-T08;Pedaleira;Tubo;Braco pedaleira inferior D;20x30;20x30 x 298;298;angulo;0,267;
+PE-T09;Pedaleira;Tubo;Braco pedaleira superior D;20x30;20x30 x 526;526;angulo;0,471;
+PE-T10;Pedaleira;Tubo;Travessa pedaleira inferior;20x30;20x30 x 400;400;reto;0,359;
+PE-T11;Pedaleira;Tubo;Travessa pedaleira superior;20x30;20x30 x 400;400;reto;0,359;
+PE-T12;Pedaleira;Tubo;Tubo de torcao pedaleira;20x30;20x30 x 360;360;reto;0,323;
+PE-T13;Pedaleira;Tubo;Alavanca haste pedaleira;20x30;20x30 x 240;240;reto;0,215;
+PE-T14;Pedaleira;Tubo;Haste comando pedaleira;20x30;20x30 x 210;210;reto;0,188;
 PE-PI04;Pedaleira;Pino;Pino haste/alavanca pedaleira;;Ø16 x 50;;;0,079;Pino aco 1045 Ø16 x 50 mm + 2 travas (anel elastico) + 2 buchas soldadas
-PE-T15;Pedaleira;Tubo;Poste suporte haste pedaleira;20x30;20x30 x 320;320;reto;0,462;
+PE-T15;Pedaleira;Tubo;Poste suporte haste pedaleira;20x30;20x30 x 320;320;reto;0,287;
 PE-PI05;Pedaleira;Pino;Pino haste pedaleira no poste;;Ø16 x 48;;;0,076;Pino aco 1045 Ø16 x 48 mm + 2 travas (anel elastico) + 2 buchas soldadas
-PE-T16;Pedaleira;Tubo;Mao-francesa poste haste pedaleira;20x30;20x30 x 380;380;angulo;0,547;
-M-T28;Chassi móvel;Tubo;Travessa suporte haste pedaleira;20x30;20x30 x 510;510;reto;0,737;
+PE-T16;Pedaleira;Tubo;Mao-francesa poste haste pedaleira;20x30;20x30 x 380;380;angulo;0,340;
+M-T29;Chassi móvel;Tubo;Travessa suporte haste pedaleira;20x30;20x30 x 510;510;reto;0,457;
 VO-CH01;Volante;Chapa/peça usinada;Patim trilho mastro E;;80 x 30 x 12;;;0,226;
 VO-T01;Volante;Tubo;Coluna volante E;30x50;30x50 x 728;728;reto;1,064;
 VO-CH02;Volante;Chapa/peça usinada;Guia superior coluna/anel E;;80 x 50 x 6;;;0,188;
@@ -203,51 +193,45 @@ VO-PI02;Volante;Pino;Pino indexador mastro D;;Ø12 x 24;;;0,021;Pino de trava ra
 VO-CO02;Volante;Comprado;Mancal tubo torcao D;;Ø60 x 30;;;0,400;Mancal flangeado para eixo Ø25
 VO-T03;Volante;Tubo;Tubo de torcao volante;30x50;30x50 x 504;504;reto;0,737;
 VO-PI03;Volante;Pino;Eixo pivo volante;;Ø25 x 600;;;2,312;
-VO-CH07;Volante;Chapa/peça usinada;Mesa volante 300x240x4;;300 x 240 x 4;;;2,261;
+VO-CH07;Volante;Chapa/peça usinada;Mesa volante 300x240x3;;300 x 240 x 3;;;1,696;
 VO-CO03;Volante;Comprado;Volante G920 (base);;260 x 232 x 170;;;1,600;Logitech G920 - volante (270 x 260 x 278 mm, 2,25 kg)
 VO-CO04;Volante;Comprado;Volante G920 (tampa);;190 x 180 x 20;;;0,050;Logitech G920 - volante (270 x 260 x 278 mm, 2,25 kg)
 VO-CO05;Volante;Comprado;Volante G920 (aro);;;;;0,500;Logitech G920 - volante (270 x 260 x 278 mm, 2,25 kg)
 VO-CO06;Volante;Comprado;Volante G920 (cubo);;Ø84 x 58;;;0,100;Logitech G920 - volante (270 x 260 x 278 mm, 2,25 kg)
 VO-T04;Volante;Tubo;Braco volante E;30x50;30x50 x 473;473;angulo;0,691;
 VO-T05;Volante;Tubo;Braco volante D;30x50;30x50 x 473;473;angulo;0,691;
-VO-T06;Volante;Tubo;Alavanca came volante E;20x30;20x30 x 152;152;reto;0,220;
+VO-T06;Volante;Tubo;Alavanca came volante E;20x30;20x30 x 152;152;reto;0,136;
 VO-PI04;Volante;Pino;Pino seguidor came volante E;;Ø12 x 24;;;0,021;Pino aco 1045 Ø12 x 24 mm + 2 travas (anel elastico) + 2 buchas soldadas
-VO-CH08;Volante;Chapa/peça usinada;Chapa came volante E;;243 x 140 x 6;;;1,606;
-VO-T07;Volante;Tubo;Alavanca came volante D;20x30;20x30 x 152;152;reto;0,220;
+VO-CH08;Volante;Chapa/peça usinada;Chapa came volante 4mm E;;236 x 140 x 4;;;1,039;
+VO-T07;Volante;Tubo;Alavanca came volante D;20x30;20x30 x 152;152;reto;0,136;
 VO-PI05;Volante;Pino;Pino seguidor came volante D;;Ø12 x 24;;;0,021;Pino aco 1045 Ø12 x 24 mm + 2 travas (anel elastico) + 2 buchas soldadas
-VO-CH09;Volante;Chapa/peça usinada;Chapa came volante D;;243 x 140 x 6;;;1,606;
-A-T01;Anel estrutural;Tubo;Coluna anel D y25;20x30;20x30 x 585;585;reto;0,845;
-A-T02;Anel estrutural;Tubo;Coluna anel D y300;20x30;20x30 x 585;585;reto;0,845;
-A-T03;Anel estrutural;Tubo;Coluna anel D y700;20x30;20x30 x 585;585;reto;0,845;
-A-T04;Anel estrutural;Tubo;Coluna anel D y1050;20x30;20x30 x 585;585;reto;0,845;
-A-T05;Anel estrutural;Tubo;Coluna anel D y1450;20x30;20x30 x 585;585;reto;0,845;
-A-T06;Anel estrutural;Tubo;Coluna anel D y1765;20x30;20x30 x 585;585;reto;0,845;
-A-T07;Anel estrutural;Tubo;Coluna anel E y25;20x30;20x30 x 585;585;reto;0,845;
-A-T08;Anel estrutural;Tubo;Coluna anel E y200;20x30;20x30 x 585;585;reto;0,845;
-A-T09;Anel estrutural;Tubo;Coluna anel E y1097;20x30;20x30 x 585;585;reto;0,845;
-A-T10;Anel estrutural;Tubo;Coluna anel E y1450;20x30;20x30 x 585;585;reto;0,845;
-A-T11;Anel estrutural;Tubo;Coluna anel E y1765;20x30;20x30 x 585;585;reto;0,845;
-A-T12;Anel estrutural;Tubo;Anel lado D;20x30;20x30 x 1760;1760;reto;2,542;
-A-T13;Anel estrutural;Tubo;Travessa traseira rebaixada;20x30;20x30 x 570;570;reto;0,823;
-A-T14;Anel estrutural;Tubo;Anel dianteiro;20x30;20x30 x 570;570;reto;0,823;
-A-T15;Anel estrutural;Tubo;Anel lado E traseiro;20x30;20x30 x 195;195;reto;0,282;
-A-T16;Anel estrutural;Tubo;Anel lado E dianteiro;20x30;20x30 x 688;688;reto;0,993;
-A-T17;Anel estrutural;Tubo;Diagonal anel D y25-300;20x30;20x30 x 616;616;angulo;0,889;
-A-T18;Anel estrutural;Tubo;Diagonal anel D y300-700;20x30;20x30 x 677;677;angulo;0,978;
-A-T19;Anel estrutural;Tubo;Diagonal anel D y700-1050;20x30;20x30 x 650;650;angulo;0,939;
-A-T20;Anel estrutural;Tubo;Diagonal anel D y1050-1450;20x30;20x30 x 677;677;angulo;0,978;
-A-T21;Anel estrutural;Tubo;Diagonal anel D y1450-1765;20x30;20x30 x 633;633;angulo;0,914;
-A-T22;Anel estrutural;Tubo;Diagonal anel E y25-200;20x30;20x30 x 582;582;angulo;0,839;
-A-T23;Anel estrutural;Tubo;Diagonal anel E y1097-1450;20x30;20x30 x 652;652;angulo;0,941;
-A-T24;Anel estrutural;Tubo;Diagonal anel E y1450-1765;20x30;20x30 x 633;633;angulo;0,914;
-A-T25;Anel estrutural;Tubo;Diagonal quadro traseiro;20x30;20x30 x 691;691;angulo;0,998;
-A-T26;Anel estrutural;Tubo;Diagonal quadro dianteiro;20x30;20x30 x 800;800;angulo;1,154;
+VO-CH09;Volante;Chapa/peça usinada;Chapa came volante 4mm D;;236 x 140 x 4;;;1,039;
+A-T01;Anel estrutural;Tubo;Coluna anel D y25;20x30;20x30 x 585;585;reto;0,525;
+A-T02;Anel estrutural;Tubo;Coluna anel D y400;20x30;20x30 x 585;585;reto;0,525;
+A-T03;Anel estrutural;Tubo;Coluna anel D y1000;20x30;20x30 x 585;585;reto;0,525;
+A-T04;Anel estrutural;Tubo;Coluna anel D y1765;20x30;20x30 x 585;585;reto;0,525;
+A-T05;Anel estrutural;Tubo;Coluna anel E y25;20x30;20x30 x 585;585;reto;0,525;
+A-T06;Anel estrutural;Tubo;Coluna anel E y200;20x30;20x30 x 585;585;reto;0,525;
+A-T07;Anel estrutural;Tubo;Coluna anel E y1131;20x30;20x30 x 585;585;reto;0,525;
+A-T08;Anel estrutural;Tubo;Coluna anel E y1450;20x30;20x30 x 585;585;reto;0,525;
+A-T09;Anel estrutural;Tubo;Coluna anel E y1765;20x30;20x30 x 585;585;reto;0,525;
+A-T10;Anel estrutural;Tubo;Anel lado D;20x30;20x30 x 1760;1760;reto;1,578;
+A-T11;Anel estrutural;Tubo;Travessa traseira rebaixada;20x30;20x30 x 570;570;reto;0,511;
+A-T12;Anel estrutural;Tubo;Anel dianteiro;20x30;20x30 x 570;570;reto;0,511;
+A-T13;Anel estrutural;Tubo;Anel lado E traseiro;20x30;20x30 x 195;195;reto;0,175;
+A-T14;Anel estrutural;Tubo;Anel lado E dianteiro;20x30;20x30 x 654;654;reto;0,586;
+A-T15;Anel estrutural;Tubo;Diagonal anel D y25-400;20x30;20x30 x 664;664;angulo;0,595;
+A-T16;Anel estrutural;Tubo;Diagonal anel D y400-1000;20x30;20x30 x 807;807;angulo;0,723;
+A-T17;Anel estrutural;Tubo;Diagonal anel E y25-200;20x30;20x30 x 582;582;angulo;0,521;
+A-T18;Anel estrutural;Tubo;Diagonal anel E y1131-1450;20x30;20x30 x 635;635;angulo;0,569;
+A-T19;Anel estrutural;Tubo;Diagonal quadro traseiro;20x30;20x30 x 691;691;angulo;0,619;
+A-T20;Anel estrutural;Tubo;Diagonal quadro dianteiro;20x30;20x30 x 800;800;angulo;0,717;
 A-CH01;Anel estrutural;Chapa/peça usinada;Chapa suporte cambio 190x140x6;;190 x 150 x 6;;;1,342;
-A-T27;Anel estrutural;Tubo;Mao-francesa suporte cambio;20x30;20x30 x 123;123;angulo;0,178;
+A-T21;Anel estrutural;Tubo;Mao-francesa suporte cambio;20x30;20x30 x 123;123;angulo;0,110;
 A-CO01;Anel estrutural;Comprado;Cambio (carcaca);;165 x 130 x 70;;;0,700;Logitech Driving Force Shifter (130 x 165 x 167 mm, estimado)
 A-CO02;Anel estrutural;Comprado;Cambio (alavanca);;Ø14 x 72;;;0,100;Logitech Driving Force Shifter (130 x 165 x 167 mm, estimado)
 A-CO03;Anel estrutural;Comprado;Cambio (manopla);;;;;0,100;Logitech Driving Force Shifter (130 x 165 x 167 mm, estimado)
-PO-T01;Barra da porta;Tubo;Barra da porta;20x30;20x30 x 868;868;reto;1,253;
+PO-T01;Barra da porta;Tubo;Barra da porta;30x50;30x50 x 902;902;reto;1,319;
 PO-PI01;Barra da porta;Pino;Eixo dobradica porta;;Ø16 x 50;;;0,079;Pino aco 1045 Ø16 x 50 mm + 2 travas (anel elastico) + 2 buchas soldadas
 PO-CH01;Barra da porta;Chapa/peça usinada;Orelhas dobradica porta;;44 x 40 x 30;;;0,414;
 PO-CH02;Barra da porta;Chapa/peça usinada;Fecho da porta - orelha externa;;40 x 35 x 6;;;0,066;

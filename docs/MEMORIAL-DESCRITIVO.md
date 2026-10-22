@@ -6,8 +6,8 @@
 | Usuário-alvo | 170–175 cm, 90 kg (premissa de cálculo) |
 | Periféricos | Logitech **G920** (volante + pedais) e **Driving Force Shifter**; óculos de **realidade virtual** (sem monitores) |
 | Movimento | 2 graus de liberdade (arfagem e rolagem) por dois motores de passo NEMA 34 com redutor |
-| Estrutura | Tubo de aço retangular **30×50×1,2** (maior esforço), **20×30×2,0** (estrutura geral) e **10×20×1,2** (contraventamento leve) |
-| Revisão | **R3** — anteprojeto verificado, pronto para revisão independente antes do desenho final |
+| Estrutura | Tubo de aço retangular **30×50×1,2** (maior esforço), **20×30×1,2** (estrutura geral) e **10×20×1,2** (contraventamento leve) |
+| Revisão | **R3-leve** — anteprojeto verificado, pronto para revisão independente antes do desenho final |
 
 ### Histórico de revisões
 
@@ -17,6 +17,7 @@
 | R1 | Peças únicas: banco em quadrilátero articulado, pedaleira basculante e volante em braço pivotado, todos sobre trilhos. Periféricos substituídos pelo Logitech G920 + câmbio. Transição animada via componente dinâmico |
 | R2 | Banco com subchassi nivelado, assento inclinável (25° no F1) e encosto em dois segmentos com apoio superior de ombros/cabeça articulado na clavícula |
 | **R3** | Detalhada na lista a seguir |
+| **R3-leve** | Redução de peso de 179 para 136 kg (móvel de 130 para 98 kg): parede 1,2 mm no 20×30, anel reduzido a guia com diagonais só no vão do pivô, base com 8 travessas, chapas finas, banco com espinha em vez de quadro, força de projeto na haste limitada a 1,8 kN no driver. Toda a verificação refeita |
 
 Mudanças da **R3**:
 
@@ -119,23 +120,23 @@ Os três documentos de números são **gerados** a partir do modelo. Nenhum valo
 |---|---|
 | Base | 720 × 2050 mm (Y −200 → 1850) |
 | Chassi móvel | 570 × 1780 mm |
-| Anel | ±295 mm, z = 930 mm (ZP + 550) |
+| Anel | ±295 mm, z = 930 mm (ZP + 550), 4 colunas por lado |
 | Topo da cabeça | 1297 mm (F1) / 1825 mm (caminhão) |
-| Massa da estrutura completa (sem piloto) | ≈ 179 kg (lista de materiais) |
-| Massa móvel + piloto | ≈ 220 kg |
+| Massa da estrutura completa (sem piloto) | ≈ 136 kg (lista de materiais): 98 kg móveis + 39 kg de base |
+| Massa móvel + piloto | ≈ 188 kg |
 
 ## 6. Plataforma-base (fixa)
 
-- **Quadro:** longarinas 20×30 em X = ±330; 10 travessas; diagonal 10×20.
+- **Quadro:** longarinas 20×30 em X = ±330; 8 travessas; diagonal 10×20.
 - **Torre do pivô:**
   - 4 pernas inclinadas 20×30;
-  - chapa de topo 160×160×15;
+  - chapa de topo 160×160×8;
   - **junta cardan** comprada (cruzeta com rolamentos de agulha) com centro em Y = 700, Z = 268. O eixo Y
     (rolagem) fica no garfo inferior e o eixo X (arfagem) no superior.
 - **Atuadores** (um por lado):
   - motor NEMA 34 em malha fechada;
   - redutor planetário 20:1;
-  - **braço de manivela em chapa de aço de 12 mm** (raio 100 mm). A R2 usava tubo 20×30, que veria
+  - **braço de manivela em chapa de aço de 10 mm** (raio 100 mm). A R2 usava tubo 20×30, que veria
     ≈ 120 MPa cíclicos na força máxima;
   - terminais rotulares M16 e barra roscada M16 até a plataforma (Y = 60, X = ±310).
 - **Batentes de borracha** dianteiros em Y = 1700: proteção mecânica além do limite de software.
@@ -148,14 +149,14 @@ Os três documentos de números são **gerados** a partir do modelo. Nenhum valo
 - **Longarinas principais:** 30×50 em X = ±270, Y 0 → 1780.
 - **Travessas:**
   - 30×50 em Y = 25;
-  - **três travessas 30×50 no pivô** (Y = 650/700/750), sobre a **chapa do pivô 300×140×16** que recebe o
-    garfo superior do cardan;
+  - **três travessas 30×50 no pivô** (Y = 650/700/750), com a **chapa do pivô 300×140×8** entre elas e o
+    garfo superior do cardan (o garfo apoia direto nas travessas; a chapa é só reforço);
   - demais travessas em 20×30;
   - diagonais de piso 10×20.
 - **Trilhos do banco e da pedaleira:** 30×50 deitados. A R2 tinha os trilhos do banco em 10×20, que ficavam
   sobrecarregados.
 - **Treliça de soleira (lado esquerdo).** A abertura da porta interrompe a treliça do anel no lado esquerdo. Sem
-  reforço, a força das hastes traseiras chegaria ao pivô só pela longarina em flexão: ≈ 620 MPa na força máxima.
+  reforço, a força das hastes traseiras chegaria ao pivô só pela longarina em flexão: ≈ 450 MPa na força máxima.
   - Por isso há uma treliça rasa sob a longarina esquerda: banzo inferior 30×50, montantes e diagonais 20×30.
   - Nós em Y = 60/300/700/≈1100.
   - Altura de 60 → 130 → **205** → 60 mm: é máxima no pivô, onde o momento é máximo, e baixa nas pontas para
@@ -165,8 +166,10 @@ Os três documentos de números são **gerados** a partir do modelo. Nenhum valo
 
 - **Posição:** cota z = 930 mm (ZP + 550). Fica abaixo dos ombros no F1 e serve de base para os reforços do
   banco, do volante e do câmbio.
-- **Laterais:** treliças com montantes e uma diagonal por vão. Estações à direita em Y = 25/300/700/1050/
-  1450/1765; à esquerda em Y = 25/200, porta, ≈1100/1450/1765.
+- **Laterais:** 4 colunas por lado. À direita em Y = 25/400/1000/1765, com diagonais só nos dois vãos em
+  torno do pivô, que levam o momento das hastes até as travessas do pivô. À esquerda em Y = 25/200, porta e
+  1765, com uma diagonal no vão traseiro. No resto o anel é guia e proteção, não treliça: a função de treliça
+  lateral é da soleira (7.1).
 - **Quadro dianteiro:** travessa no anel e diagonal.
 - **Quadro traseiro rebaixado:** travessa a z = 760 mm, com diagonal. Ela passa por baixo do apoio de cabeça do
   F1, que avança além da traseira do chassi. Uma travessa na altura do anel colidiria com o apoio — o primeiro
@@ -176,8 +179,8 @@ Os três documentos de números são **gerados** a partir do modelo. Nenhum valo
 
 ### 7.3 Barra da porta
 
-- **Construção:** tubo 20×30 de ≈ 870 mm entre a dobradiça (Y = 200, montante traseiro esquerdo) e o fecho
-  (Y ≈ 1100).
+- **Construção:** tubo 30×50 em pé, de ≈ 930 mm entre a dobradiça (Y = 200, montante traseiro esquerdo) e o
+  fecho (Y ≈ 1160). Com parede 1,2 mm, o 20×30 não atendia à carga de apoio.
 - **Abertura:** **gira 85° para cima** em torno de um eixo transversal (X), em vez de abrir para fora como uma
   porta de automóvel. Assim não ocupa espaço lateral, e o piloto entra passando por cima da soleira e por baixo da
   barra levantada.
@@ -185,7 +188,7 @@ Os três documentos de números são **gerados** a partir do modelo. Nenhum valo
   para dentro da forquilha e o pino atravessa as três peças.
 - **Animação:** componente dinâmico com atributo próprio **`aberta`**. Clicar na barra com a ferramenta Interagir
   roda `ANIMATE("aberta",0,1)`.
-- **Resistência:** atende uma pessoa apoiada no meio do vão com 600 N (93 MPa, ver `CALCULOS.md`). Não é
+- **Resistência:** atende uma pessoa apoiada no meio do vão com 600 N (54 MPa, ver `CALCULOS.md`). Não é
   degrau.
 
 ### 7.4 Câmbio
@@ -213,7 +216,7 @@ carros), porque a relação entre os cursos é fixa: banco +58,5 mm, pedaleira �
 | **Par de hastes do encosto** (275 mm, X = ±100) | Gira o encosto lombar de 35° para 75°. Em par para dividir o momento do encosto e apoiar o carro junto às suas longarinas |
 | **Tirante paralelo do apoio superior** (par, 10×20) | Fecha um paralelogramo com o eixo do encosto: o apoio de ombros/cabeça fica **sempre a 75° da horizontal**, sem trava nem ajuste |
 | Calços de borracha F1 (4) | No F1 as bielas ficam quase deitadas e não devem carregar peso: o subchassi apoia em calços sobre as longarinas principais |
-| Quadros de aço | Assento, encosto e apoio têm quadro 20×30 sob o estofado, onde ficam eixos e alavancas |
+| Espinhas de aço | Assento, encosto e apoio têm uma travessa 20×30 sob a base de compensado de 15 mm, onde ficam eixos e alavancas |
 
 ### 8.2 Pedaleira
 
@@ -250,7 +253,7 @@ força na haste) com **ângulo de transmissão ≥ 25°** em todo o curso.
 | Apoio superior | 75° | 75° |
 | Coxa / joelho / tornozelo | +25° / 145° / 100° | +5° / 120° / 90° |
 | Plano do aro | 80° | 45° |
-| Recuo em relação à v2 (balanceamento) | 52 mm | 198 mm |
+| Recuo em relação à v2 (balanceamento) | 18 mm | 171 mm |
 
 O gerador recua cada conjunto (banco + pedaleira + volante) ao longo de Y, sem mudar a ergonomia, até o CG
 longitudinal cair sobre o pivô. O erro final é < 1 mm nos dois modos.
@@ -276,11 +279,11 @@ longitudinal cair sobre o pivô. O erro final é < 1 mm nos dois modos.
 
 | Item | Valor |
 |---|---|
-| Massa móvel + piloto | 219,6 kg; CG 454 mm (F1) / 647 mm (caminhão) acima do pivô |
+| Massa móvel + piloto | 187,9 kg; CG 466 mm (F1) / 676 mm (caminhão) acima do pivô |
 | Limites de software | arfagem ±7,8°; rolagem F1 **±16,2°** (pura); rolagem caminhão ±6° |
-| Motor / redução | NEMA 34 malha fechada 12 N·m + planetário **20:1**; torque limitado a 6,9 N·m no driver |
-| Desempenho estimado | F1 rolagem ±16° até ≈ 1,07 Hz; ±8° até ≈ 1,57 Hz (≈ 79 °/s) |
-| Força de projeto na haste | 2,5 kN (limitada no driver) |
+| Motor / redução | NEMA 34 malha fechada 12 N·m + planetário **20:1**; torque limitado a 5,0 N·m no driver |
+| Desempenho estimado | F1 rolagem ±16° até ≈ 1,1 Hz; ±8° até ≈ 1,4 Hz (≈ 72 °/s) |
+| Força de projeto na haste | 1,8 kN (limitada no driver; a necessidade cíclica é 1,1 kN) |
 | Molas de centragem | par de arfagem: 4,8 N/mm; par de rolagem: 19,2 N/mm; rigidez 1,1 × m·g·h do caminhão |
 
 **Freio econômico:**
@@ -314,7 +317,7 @@ Defeitos da proposta inicial da v3 encontrados e corrigidos por essas verificaç
 - base da pedaleira × trilhos;
 - longarina × placas dos motores;
 - haste do encosto × almofada;
-- longarina esquerda sem treliça (620 MPa);
+- longarina esquerda sem treliça (620 MPa com 2,5 kN; 450 MPa com 1,8 kN);
 - chapa do pivô (151 MPa);
 - poste da haste da pedaleira em balanço (587 MPa);
 - alavanca do encosto (440 MPa);

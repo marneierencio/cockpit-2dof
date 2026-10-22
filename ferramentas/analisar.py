@@ -258,7 +258,7 @@ def main():
             ("F1", "r", 8.0, "F1 rolagem"), ("F1", "p", 4.0, "F1 arfagem"),
             ("Caminhao", "p", round(lim["arfagem_pura"], 1), "Caminhao arfagem"), ("Caminhao", "r", 6.0, "Caminhao rolagem")]
     # torque cap: limit the rod force at the software crank-angle limit
-    F_DESIGN = 2500.0
+    F_DESIGN = 1800.0
     cap = {}
     for N in RATIOS:
         cap[N] = F_DESIGN * c.r * math.cos(math.radians(CRANK_PHI_MAX)) / (N * ETA_GEAR)
@@ -305,8 +305,9 @@ def main():
     c.add("Travessas do pivo (3 x 30x50)", "pico (peso x %.1f + molas + 2 hastes)" % DYN, M_cross_peak * 1000 / s3050["Ws"], "MPa",
           SIG_ADM, "P = %.1f kN" % (P_design / 1000))
     c.add("Travessas do pivo (3 x 30x50)", "fadiga", 2 * M_cross_cyc * 1000 / s3050["Ws"], "MPa", DSIG_FAT, "")
-    Wp = 140.0 * 16 ** 2 / 6
-    c.add("Chapa do pivo 300x140x16", "pico", (P_design / 2) * 0.090 * 1000 / Wp, "MPa", SIG_ADM, "balanco 90 mm ate o garfo")
+    Wp = 140.0 * 8 ** 2 / 6
+    c.add("Chapa do pivo 300x140x8 (sobre 3 travessas)", "pico", (P_design / 2) * 0.025 * 1000 / Wp, "MPa", SIG_ADM,
+          "vao 50 mm entre travessas, braco 25 mm")
     # 3. base tower legs
     leg_sin = 183.0 / math.sqrt(155.0 ** 2 + 110.0 ** 2 + 183.0 ** 2)
     N_leg = P_design / (4 * leg_sin)
@@ -380,7 +381,7 @@ def main():
     M_w = F_WHEEL * arm_len * DYN
     c.add("Bracos do volante (2 x 30x50, eixo fraco)", "flexao", M_w / 2 * 1000 / secs["30x50"]["Ww"], "MPa", SIG_ADM, "")
     F_follow = M_w / 0.140 / 2
-    c.add("Pino seguidor came do volante (Ø12, chapa 6)", "esmagamento", F_follow / (12 * 6), "MPa", SIG_ADM, "")
+    c.add("Pino seguidor came do volante (Ø12, chapa 4)", "esmagamento", F_follow / (12 * 4), "MPa", SIG_ADM, "")
     hq = (GEO["Q"][2] - ns["ZP"]) / 1000.0
     c.add("Colunas do mastro (2 x 30x50, sem contar a guia no anel)", "flexao no pe", F_WHEEL * DYN * hq / 2 * 1000 / secs["30x50"]["Ws"],
           "MPa", SIG_ADM, "a guia no anel reduz muito este valor")
@@ -388,11 +389,11 @@ def main():
     m_tip = 2.25 + 0.4 * 7.85e-6 * 300 * 240 * 4 * 1000 / 1000 + 0.5
     f_arm = math.sqrt(k_arm / m_tip) / (2 * math.pi)
     # crank and rods
-    c.add("Braco da manivela (chapa 12x50)", "flexao", F_DESIGN * 100 / (12 * 50 ** 2 / 6), "MPa", SIG_ADM, "")
+    c.add("Braco da manivela (chapa 10x50)", "flexao", F_DESIGN * 100 / (10 * 50 ** 2 / 6), "MPa", SIG_ADM, "")
     c.add("Haste M16 (barra roscada)", "tracao", F_DESIGN / 157.0, "MPa", SIG_ADM, "area resistente 157 mm2")
     # door bar and ring
     span = (GEO["door_f"] - GEO["door_r"]) / 1000.0
-    c.add("Barra da porta (20x30x2)", "pessoa apoiada no meio do vao (%.0f N)" % F_DOOR, F_DOOR * span / 4 * 1000 / secs["20x30"]["Ws"],
+    c.add("Barra da porta (30x50x1,2, em pe)", "pessoa apoiada no meio do vao (%.0f N)" % F_DOOR, F_DOOR * span / 4 * 1000 / secs["30x50"]["Ws"],
           "MPa", SIG_ADM, "vao %.0f mm" % (span * 1000))
     # seat rails
     span_r = 0.350

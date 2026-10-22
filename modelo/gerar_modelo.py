@@ -59,7 +59,7 @@ RING_X = 295.0                # ring lateral centreline
 RING_REAR_Z = ZP + 380.0      # rear frame cross, lowered so the F1 headrest passes above it
 DRIVER_KG = 90.0
 
-PROFILES = {"30x50": (30.0, 50.0, 1.2), "20x30": (20.0, 30.0, 2.0), "10x20": (10.0, 20.0, 1.2)}
+PROFILES = {"30x50": (30.0, 50.0, 1.2), "20x30": (20.0, 30.0, 1.2), "10x20": (10.0, 20.0, 1.2)}
 
 # ----------------------------------------------------------------------------
 # Vector helpers (plain 3-tuples, mm)
@@ -425,7 +425,7 @@ CARR_TOP = RAIL_TOP + 30.0
 COARSE = False                # coarse mechanism searches (used while balancing)
 
 # >>> PRESET (written by ferramentas/analisar.py - do not edit by hand)
-PRESET = {'kl': 80, 'drag_gy': 310, 'back_cand': 33, 'back_gy': 436, 'pan_cand': 5, 'pan_gy': 426, 'ped_ll': 240, 'ped_ang': 180, 'ped_gz': 680, 'shift': [-51.982, -197.576]}
+PRESET = {'kl': 80, 'drag_gy': 350, 'back_cand': 33, 'back_gy': 470, 'pan_cand': 5, 'pan_gy': 460, 'ped_ll': 240, 'ped_ang': 180, 'ped_gz': 680, 'shift': [-17.785, -170.666]}
 # <<< PRESET
 # The SketchUp sandbox stops a script after 30 s, which is less than the
 # mechanism searches take. When EMIT is on and PRESET holds the solution found
@@ -454,7 +454,7 @@ def build(shift_f1, shift_trk):
     for s in (-1, 1):
         sd = "E" if s < 0 else "D"
         tube(B, "B", "Longarina base " + sd, (s * 330, Y0, 15), (s * 330, Y1, 15), "20x30")
-    for y in (-190.0, -120.0, 40.0, 300.0, 560.0, 700.0, 840.0, 1100.0, 1700.0, 1840.0):
+    for y in (-190.0, 40.0, 300.0, 560.0, 840.0, 1100.0, 1700.0, 1840.0):
         tube(B, "B", "Travessa base y%d" % int(y), (-320, y, 15), (320, y, 15), "20x30")
     tube(B, "B", "Diagonal base", (-320, 850, 15), (320, 1690, 15), "10x20", cut="angulo")
     for s in (-1, 1):
@@ -463,7 +463,7 @@ def build(shift_f1, shift_trk):
         for (yb, yt) in ((560, 670), (840, 730)):
             tube(B, "B", "Perna torre pivo", (sx * 200, yb, 30), (sx * 45, yt, 213), "20x30",
                  up=(0, 1 if yb < 700 else -1, 0), cut="angulo")
-    abox(B, "B", "CH", "Chapa topo torre pivo 160x160x15", -80, 620, 213, 80, 780, 228, "Chapa")
+    abox(B, "B", "CH", "Chapa topo torre pivo 160x160x8", -80, 620, 220, 80, 780, 228, "Chapa")
     # cardan (bought-in universal joint): pitch about X, roll about Y
     cj = "Junta cardan (cruzeta com rolamentos de agulha), capacidade estatica >= 20 kN"
     abox(B, "B", "CO", "Garfo inferior cardan", -35, 655, 228, 35, 745, 250, "Cardan", spec=cj, group="Junta_Cardan")
@@ -474,7 +474,7 @@ def build(shift_f1, shift_trk):
     actuators = []
     for s in (-1, 1):
         sd = "E" if s < 0 else "D"
-        abox(B, "B", "CH", "Chapa suporte motor " + sd, s * 285, -120, 30, s * 295, 0, 207, "Chapa")
+        abox(B, "B", "CH", "Chapa suporte motor 6mm " + sd, s * 289, -120, 30, s * 295, 0, 207, "Chapa")
         cyl(B, "B", "CO", "Redutor planetario " + sd, (s * 285, MY, MZ), (s * 190, MY, MZ), 42, "Aco", mass=3.0,
             spec="Redutor planetario 20:1 para NEMA 34 (flange 86 mm), torque nominal de saida >= 150 N.m")
         abox(B, "B", "CO", "Motor de passo NEMA 34 " + sd, s * 190, MY - 43, MZ - 43, s * 40, MY + 43, MZ + 43,
@@ -482,7 +482,7 @@ def build(shift_f1, shift_trk):
         abox(B, "B", "CH", "Calco motor " + sd, s * 105, MY - 30, 30, s * 125, MY + 30, MZ - 43, "Chapa")
         cyl(B, "B", "PI", "Eixo saida redutor " + sd, (s * 295, MY, MZ), (s * 318, MY, MZ), 10, "Aco")
         # crank: 12 mm plate (a 20x30 tube would see ~120 MPa cyclic at the motor's max force)
-        abox(B, "B", "CH", "Braco manivela 12mm " + sd, s * ROD_X - 6, MY - 25, MZ - 25, s * ROD_X + 6, ROD_Y + 25,
+        abox(B, "B", "CH", "Braco manivela 10mm " + sd, s * ROD_X - 5, MY - 25, MZ - 25, s * ROD_X + 5, ROD_Y + 25,
              MZ + 25, "Aco")
         ball(B, "B", "CO", "Terminal rotular inferior " + sd, (s * ROD_X, ROD_Y, MZ), 13, "Aco",
              spec="Terminal rotular M16 (rod end)")
@@ -505,7 +505,8 @@ def build(shift_f1, shift_trk):
     for (ya, yb) in ((25.0, 300.0), (1100.0, 1450.0)):
         tube(M, "M", "Diagonal piso y%d-%d" % (int(ya), int(yb)), (-250, ya + 15, ZP - 10), (250, yb - 15, ZP - 10),
              "10x20", cut="angulo")
-    abox(M, "M", "CH", "Chapa pivo 300x140x16", -150, 630, ZP - 66, 150, 770, ZP - 50, "Chapa")
+    # the fork sits right on the three pivot crosses; the plate is a doubler, not a beam
+    abox(M, "M", "CH", "Chapa pivo 300x140x8", -150, 630, ZP - 58, 150, 770, ZP - 50, "Chapa")
     # sill truss under the left main rail: the door gap interrupts the ring truss on
     # that side, so the rear rod force reaches the pivot crosses through this
     # shallow truss (top chord = main rail) instead of the rail alone in bending.
@@ -534,7 +535,7 @@ def build(shift_f1, shift_trk):
             spec="Barra rosqueada M16 + porcas (entre rotulas)")
         ball(M, "M", "CO", "Terminal rotular superior " + sd, (s * ROD_X, ROD_Y, ZP - 83), 13, "Aco",
              spec="Terminal rotular M16 (rod end)")
-    abox(M, "M", "CO", "Garfo superior cardan", -60, 670, 300, 60, 730, ZP - 66, "Cardan", spec=cj, group="Junta_Cardan")
+    abox(M, "M", "CO", "Garfo superior cardan", -60, 670, 300, 60, 730, ZP - 58, "Cardan", spec=cj, group="Junta_Cardan")
     for sx in (-1, 1):
         abox(M, "M", "CO", "Orelha garfo superior", sx * 48 - 7, 684, 252, sx * 48 + 7, 716, 300, "Cardan", spec=cj,
              group="Junta_Cardan")
@@ -547,20 +548,13 @@ def build(shift_f1, shift_trk):
 
     # ======================= SEAT (1 DOF) =======================
     def seg_frame(nd, nm, o, d, back, length):
-        """Steel frame of a seat segment: two 20x30 side rails behind the cushion
-        (offset 75 mm along `back`) and two cross tubes; it carries the hinge
-        pins and the lever of the segment."""
+        """Spine of a seat segment: one 20x30 cross tube behind the cushion
+        (offset 75 mm along `back`), at 40 % of the segment length, where the
+        hinge pin and the lever plates attach. The 15 mm plywood board of the
+        cushion (mass counted in the upholstery) carries the rest."""
         off = v_mul(back, 75.0)
-        for sx in (-1, 1):
-            sd = "E" if sx < 0 else "D"
-            a = v_add(v_add(o, off), (sx * 230.0, 0.0, 0.0))
-            tube(nd, "BC", "Quadro %s lateral %s" % (nm, sd), v_add(a, v_mul(d, 15)), v_add(a, v_mul(d, length - 15)),
-                 "20x30", up=back)
-        for nm2, t in (("inferior", 0.4 * length), ("superior", length - 30.0)):
-            a = v_add(v_add(o, off), v_mul(d, t))
-            tube(nd, "BC", "Quadro %s travessa %s" % (nm, nm2), v_add(a, (-220.0, 0.0, 0.0)), v_add(a, (220.0, 0.0, 0.0)),
-                 "20x30", up=back)
-
+        a = v_add(v_add(o, off), v_mul(d, 0.4 * length))
+        tube(nd, "BC", "Espinha %s" % nm, v_add(a, (-220.0, 0.0, 0.0)), v_add(a, (220.0, 0.0, 0.0)), "20x30", up=back)
     P_SUB, N_SUB = sag(SUB_DEG), sag(SUB_DEG + 90)
     C1, C2 = F1["C"], TRK["C"]
     B_R1 = v_sub(v_add(C1, v_mul(P_SUB, 70)), v_mul(N_SUB, 95))
@@ -916,8 +910,8 @@ def build(shift_f1, shift_trk):
     pin("PCARRO", "PE", "Eixo pivo pedaleira", PED_P, 245, 9)
     node("DECK", "Pedaleira_Basculante", "PCARRO", PED_P, rot=PED_ALPHA)
     DY0 = -60.0
-    box("DECK", "PE", "CH", "Chapa fixacao pedais 400x331x3", Ph1, X, f1, ms1,
-        (-200, DY0 - 10, -(PEDAL_DEPTH + 3), 200, DY0 + G920_PED_D + 10, -PEDAL_DEPTH), "Chapa")
+    box("DECK", "PE", "CH", "Chapa fixacao pedais 400x331x2", Ph1, X, f1, ms1,
+        (-200, DY0 - 10, -(PEDAL_DEPTH + 2), 200, DY0 + G920_PED_D + 10, -PEDAL_DEPTH), "Chapa")
     xc = 0.5 * (F1["legs"]["E"]["heel"][0] + F1["legs"]["D"]["heel"][0])
     g920p = "Logitech G920 - pedais (428,5 x 311 x 167 mm, 3,1 kg)"
     box("DECK", "PE", "CO", "Pedais G920 (carcaca)", Ph1, X, f1, ms1,
@@ -1060,7 +1054,7 @@ def build(shift_f1, shift_trk):
     tY, tZ = sag(tilt0), sag(tilt0 + 90)
     BASE_DROP = 135.0
     mesa_o = v_sub(W1, v_mul(tZ, BASE_DROP))
-    box("BRACO", "VO", "CH", "Mesa volante 300x240x4", mesa_o, X, tY, tZ, (-150, 45, -4, 150, 285, 0), "Chapa")
+    box("BRACO", "VO", "CH", "Mesa volante 300x240x3", mesa_o, X, tY, tZ, (-150, 45, -3, 150, 285, 0), "Chapa")
     g920w = "Logitech G920 - volante (270 x 260 x 278 mm, 2,25 kg)"
     box("BRACO", "VO", "CO", "Volante G920 (base)", mesa_o, X, tY, tZ, (-130, 30, 0, 130, 262, 170), "Motor", mass=1.6,
         spec=g920w, group="G920_Volante")
@@ -1084,12 +1078,12 @@ def build(shift_f1, shift_trk):
         pin("BRACO", "VO", "Pino seguidor came volante " + sd, (sx * 305, lev_v[1], lev_v[2]), 12, 6)
         ymin, ymax = min(p[1] for p in vpath) - 30, max(p[1] for p in vpath) + 30
         zmin, zmax = min(p[2] for p in vpath) - 30, max(p[2] for p in vpath) + 30
-        abox("MOV", "VO", "CH", "Chapa came volante " + sd, sx * 306, ymin, max(zmin, RING_Z + 15), sx * 312, ymax, zmax, "Chapa")
+        abox("MOV", "VO", "CH", "Chapa came volante 4mm " + sd, sx * 306, ymin, max(zmin, RING_Z + 15), sx * 310, ymax, zmax, "Chapa")
 
     # ======================= RING (roll frame) + DOOR BAR =======================
     door_r = 200.0
     door_f = min(qy - 90.0, 1300.0)
-    right = [25.0, 300.0, 700.0, 1050.0, 1450.0, 1765.0]
+    right = [25.0, 400.0, 1000.0, 1765.0]
     left_rear = [25.0, door_r]
     left_front = [door_f] + [y for y in (1450.0, 1765.0) if y > door_f + 150]
     GEO.update(door_r=door_r, door_f=door_f)
@@ -1104,11 +1098,12 @@ def build(shift_f1, shift_trk):
     tube("MOV", "A", "Anel dianteiro", (-RING_X + 10, 1765, RING_Z), (RING_X - 10, 1765, RING_Z), "20x30")
     tube("MOV", "A", "Anel lado E traseiro", (-RING_X, 15, RING_Z), (-RING_X, door_r + 10, RING_Z), "20x30")
     tube("MOV", "A", "Anel lado E dianteiro", (-RING_X, door_f - 10, RING_Z), (-RING_X, 1775, RING_Z), "20x30")
-    # side trusses: one diagonal per bay (Warren), front and rear end frames
-    bays = []
-    for sx, stations in ((1, right), (-1, left_rear), (-1, left_front)):
-        for i in range(len(stations) - 1):
-            bays.append((sx, stations[i], stations[i + 1], i % 2 == 0))
+    # diagonals only where the ring carries the rod moment into the pivot (the
+    # two right-hand bays around y = 700) and in the end bays that guide the mast;
+    # elsewhere the ring is a guide rail, not a truss (v3-leve)
+    bays = [(1, right[0], right[1], True), (1, right[1], right[2], False), (-1, left_rear[0], left_rear[1], True)]
+    if len(left_front) > 1:
+        bays.append((-1, left_front[0], left_front[1], True))
     for sx, ya, yb, up_fwd in bays:
         sd = "E" if sx < 0 else "D"
         za, zb = (ZP - 25, RING_Z - 15) if up_fwd else (RING_Z - 15, ZP - 25)
@@ -1135,7 +1130,7 @@ def build(shift_f1, shift_trk):
     # door bar: hinged on the rear door post, opens upwards (rotation about X)
     hinge = (-RING_X, door_r, RING_Z)
     node("PORTA", "Porta_Barra", "MOV", hinge, rot=85.0, var="aberta")
-    tube("PORTA", "PO", "Barra da porta", (-RING_X, door_r + 15, RING_Z), (-RING_X, door_f - 15, RING_Z), "20x30")
+    tube("PORTA", "PO", "Barra da porta", (-RING_X, door_r + 15, RING_Z), (-RING_X, door_f - 15, RING_Z), "30x50")
     pin("PORTA", "PO", "Eixo dobradica porta", hinge, 25, 8)
     abox("MOV", "PO", "CH", "Orelhas dobradica porta", -RING_X - 22, door_r - 15, RING_Z - 15, -RING_X + 22, door_r + 15,
          RING_Z + 25, "Chapa")

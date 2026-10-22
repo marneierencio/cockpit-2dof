@@ -33,8 +33,8 @@ de realidade virtual**.
 - **Identificação:** toda peça tem código, por exemplo `M-T01` ou `BC-PI11`. É o mesmo no desenho, na lista de
   materiais e no plano de corte.
 
-> **Status:** anteprojeto R3 **verificado por cálculo e por checagem geométrica automática**, aguardando revisão
-> independente e protótipo. Leia a seção 13 do memorial antes de fabricar.
+> **Status:** anteprojeto R3-leve (136 kg de estrutura, 98 kg móveis) **verificado por cálculo e por checagem
+> geométrica automática**, aguardando revisão independente e protótipo. Leia a seção 13 do memorial antes de fabricar.
 
 ## Documentação
 
