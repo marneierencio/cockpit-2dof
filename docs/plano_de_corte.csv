@@ -1,0 +1,134 @@
+perfil;barra;ordem;codigo;descricao;comprimento_mm
+10x20;1;1;B-T13;Diagonal base;1057
+10x20;1;2;M-T13;Diagonal piso y1100-1450;594
+10x20;1;3;BC-T25;Tirante paralelo apoio superior E;564
+10x20;1;4;BC-T26;Tirante paralelo apoio superior D;564
+10x20;1;5;M-T12;Diagonal piso y25-300;557
+20x30;1;1;B-T01;Longarina base E;2050
+20x30;1;2;B-T02;Longarina base D;2050
+20x30;1;3;A-T12;Anel lado D;1760
+20x30;1;4;B-T20;Coluna batente E;110
+20x30;2;1;PO-T01;Barra da porta;868
+20x30;2;2;A-T26;Diagonal quadro dianteiro;800
+20x30;2;3;A-T25;Diagonal quadro traseiro;691
+20x30;2;4;A-T16;Anel lado E dianteiro;688
+20x30;2;5;A-T18;Diagonal anel D y300-700;677
+20x30;2;6;A-T20;Diagonal anel D y1050-1450;677
+20x30;2;7;A-T23;Diagonal anel E y1097-1450;652
+20x30;2;8;A-T19;Diagonal anel D y700-1050;650
+20x30;2;9;PE-T13;Alavanca haste pedaleira;240
+20x30;2;10;M-T17;Montante soleira E y60;10
+20x30;3;1;B-T03;Travessa base y-190;640
+20x30;3;2;B-T04;Travessa base y-120;640
+20x30;3;3;B-T05;Travessa base y40;640
+20x30;3;4;B-T06;Travessa base y300;640
+20x30;3;5;B-T07;Travessa base y560;640
+20x30;3;6;B-T08;Travessa base y700;640
+20x30;3;7;B-T09;Travessa base y840;640
+20x30;3;8;B-T10;Travessa base y1100;640
+20x30;3;9;B-T11;Travessa base y1700;640
+20x30;3;10;M-T19;Montante soleira E y700;155
+20x30;3;11;M-T20;Montante soleira E y1100;10
+20x30;4;1;B-T12;Travessa base y1840;640
+20x30;4;2;A-T21;Diagonal anel D y1450-1765;633
+20x30;4;3;A-T24;Diagonal anel E y1450-1765;633
+20x30;4;4;A-T17;Diagonal anel D y25-300;616
+20x30;4;5;A-T01;Coluna anel D y25;585
+20x30;4;6;A-T02;Coluna anel D y300;585
+20x30;4;7;A-T03;Coluna anel D y700;585
+20x30;4;8;A-T04;Coluna anel D y1050;585
+20x30;4;9;A-T05;Coluna anel D y1450;585
+20x30;4;10;BC-T15;Quadro assento travessa inferior;440
+20x30;5;1;A-T06;Coluna anel D y1765;585
+20x30;5;2;A-T07;Coluna anel E y25;585
+20x30;5;3;A-T08;Coluna anel E y200;585
+20x30;5;4;A-T09;Coluna anel E y1097;585
+20x30;5;5;A-T10;Coluna anel E y1450;585
+20x30;5;6;A-T11;Coluna anel E y1765;585
+20x30;5;7;A-T22;Diagonal anel E y25-200;582
+20x30;5;8;A-T13;Travessa traseira rebaixada;570
+20x30;5;9;A-T14;Anel dianteiro;570
+20x30;5;10;BC-T17;Quadro encosto lateral E;534
+20x30;5;11;VO-T06;Alavanca came volante E;152
+20x30;6;1;BC-T18;Quadro encosto lateral D;534
+20x30;6;2;PE-T07;Braco pedaleira superior E;526
+20x30;6;3;PE-T09;Braco pedaleira superior D;526
+20x30;6;4;M-T04;Travessa chassi y300;510
+20x30;6;5;M-T08;Travessa chassi y900;510
+20x30;6;6;M-T09;Travessa chassi y1100;510
+20x30;6;7;M-T10;Travessa chassi y1450;510
+20x30;6;8;M-T11;Travessa chassi y1765;510
+20x30;6;9;M-T28;Travessa suporte haste pedaleira;510
+20x30;6;10;BC-T16;Quadro assento travessa superior;440
+20x30;6;11;BC-T19;Quadro encosto travessa inferior;440
+20x30;6;12;M-T23;Diagonal soleira E y700-1100;411
+20x30;7;1;BC-T20;Quadro encosto travessa superior;440
+20x30;7;2;BC-T23;Quadro apoio superior travessa inferior;440
+20x30;7;3;BC-T24;Quadro apoio superior travessa superior;440
+20x30;7;4;PE-T05;Travessa carro pedaleira;440
+20x30;7;5;BC-T01;Longarina carro banco E;427
+20x30;7;6;BC-T02;Longarina carro banco D;427
+20x30;7;7;M-T22;Diagonal soleira E y300-700;411
+20x30;7;8;BC-T13;Quadro assento lateral E;410
+20x30;7;9;BC-T14;Quadro assento lateral D;410
+20x30;7;10;BC-T21;Quadro apoio superior lateral E;400
+20x30;7;11;BC-T22;Quadro apoio superior lateral D;400
+20x30;7;12;PE-T10;Travessa pedaleira inferior;400
+20x30;7;13;PE-T11;Travessa pedaleira superior;400
+20x30;7;14;BC-T05;Biela banco E Tras;390
+20x30;7;15;PE-T02;Torre pivo pedaleira E;90
+20x30;8;1;BC-T06;Biela banco D Tras;390
+20x30;8;2;BC-T07;Biela banco E Diant;390
+20x30;8;3;BC-T08;Biela banco D Diant;390
+20x30;8;4;PE-T16;Mao-francesa poste haste pedaleira;380
+20x30;8;5;PE-T12;Tubo de torcao pedaleira;360
+20x30;8;6;BC-T09;Longarina subchassi E;360
+20x30;8;7;BC-T11;Longarina subchassi D;360
+20x30;8;8;PE-T15;Poste suporte haste pedaleira;320
+20x30;8;9;PE-T06;Braco pedaleira inferior E;298
+20x30;8;10;PE-T08;Braco pedaleira inferior D;298
+20x30;8;11;BC-T29;Haste comando assento;292
+20x30;8;12;BC-T03;Travessa carro banco tras;280
+20x30;8;13;BC-T04;Travessa carro banco diant;280
+20x30;8;14;BC-T30;Travessa carro banco haste encosto;280
+20x30;8;15;BC-T31;Travessa carro banco haste assento;280
+20x30;8;16;BC-T27;Haste comando encosto E;276
+20x30;8;17;BC-T28;Haste comando encosto D;276
+20x30;8;18;B-T16;Perna torre pivo;264
+20x30;8;19;VO-T07;Alavanca came volante D;152
+20x30;9;1;B-T17;Perna torre pivo;264
+20x30;9;2;B-T18;Perna torre pivo;264
+20x30;9;3;B-T19;Perna torre pivo;264
+20x30;9;4;PE-T01;Longarina carro pedaleira E;230
+20x30;9;5;PE-T03;Longarina carro pedaleira D;230
+20x30;9;6;M-T21;Diagonal soleira E y60-300;221
+20x30;9;7;PE-T14;Haste comando pedaleira;207
+20x30;9;8;A-T15;Anel lado E traseiro;195
+20x30;9;9;B-T14;Apoio motor E;140
+20x30;9;10;B-T15;Apoio motor D;140
+20x30;9;11;A-T27;Mao-francesa suporte cambio;123
+20x30;9;12;BC-T10;Montante articulacao E;119
+20x30;9;13;BC-T12;Montante articulacao D;119
+20x30;9;14;B-T21;Coluna batente D;110
+20x30;9;15;PE-T04;Torre pivo pedaleira D;90
+20x30;9;16;M-T18;Montante soleira E y300;80
+20x30;9;17;BC-T32;Tirante de arrasto do carro E;77
+20x30;9;18;BC-T33;Tirante de arrasto do carro D;77
+30x50;1;1;M-T01;Longarina principal E;1780
+30x50;1;2;M-T02;Longarina principal D;1780
+30x50;1;3;M-T24;Trilho banco E;1110
+30x50;1;4;M-T26;Trilho banco D;1110
+30x50;2;1;M-T25;Trilho pedaleira E;1035
+30x50;2;2;M-T27;Trilho pedaleira D;1035
+30x50;2;3;VO-T01;Coluna volante E;728
+30x50;2;4;VO-T02;Coluna volante D;728
+30x50;2;5;M-T03;Travessa chassi y25;510
+30x50;2;6;M-T05;Travessa chassi y650;510
+30x50;2;7;M-T06;Travessa chassi y700;510
+30x50;2;8;M-T07;Travessa chassi y750;510
+30x50;2;9;M-T14;Banzo inferior soleira E y60-300;250
+30x50;3;1;VO-T03;Tubo de torcao volante;504
+30x50;3;2;VO-T04;Braco volante E;473
+30x50;3;3;VO-T05;Braco volante D;473
+30x50;3;4;M-T16;Banzo inferior soleira E y700-1100;426
+30x50;3;5;M-T15;Banzo inferior soleira E y300-700;407

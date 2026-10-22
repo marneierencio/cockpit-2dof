@@ -1,406 +1,376 @@
 # Memorial Descritivo — Cockpit de Simulação com Plataforma Móvel de 2 Graus de Liberdade
 
-| Item | Valor |
+| Item | Descrição |
 |---|---|
-| Projeto | Cockpit de simulador para jogos de computador, com duas posições de pilotagem (Fórmula 1 e caminhão) na **mesma estrutura ajustável** |
-| Usuário-alvo | Adulto entre 170 e 175 cm de altura |
-| Periféricos | Logitech **G920** (volante e pedais) + **Driving Force Shifter** (câmbio) |
-| Movimento | 2 graus de liberdade (arfagem e rolagem), por dois motores de passo |
-| Modelo 3D | `modelo/cockpit_2dof_ajustavel_G920.skp`, gerado por `modelo/gerar_modelo.py` |
-| Unidade | Milímetros (mm), salvo indicação em contrário |
-| Revisão | **R2**: assento inclinável (apoia a coxa no F1) e encosto com apoio superior articulado na clavícula (efeito de banco-concha) |
-
-> **Natureza deste documento.** Este é um memorial de **anteprojeto**. As
-> dimensões e a disposição das peças foram definidas por ergonomia e
-> geometria, e verificadas por interferência no modelo 3D. **Não houve
-> cálculo estrutural nem dimensionamento dos motores.** A seção 12 lista o
-> que ainda precisa ser verificado antes de fabricar.
+| Projeto | Cockpit de simulador para jogos, conversível entre **Fórmula 1** e **caminhão** |
+| Usuário-alvo | 170–175 cm, 90 kg (premissa de cálculo) |
+| Periféricos | Logitech **G920** (volante + pedais) e **Driving Force Shifter**; óculos de **realidade virtual** (sem monitores) |
+| Movimento | 2 graus de liberdade (arfagem e rolagem) por dois motores de passo NEMA 34 com redutor |
+| Estrutura | Tubo de aço retangular **30×50×1,2** (maior esforço), **20×30×2,0** (estrutura geral) e **10×20×1,2** (contraventamento leve) |
+| Revisão | **R3** — anteprojeto verificado, pronto para revisão independente antes do desenho final |
 
 ### Histórico de revisões
 
 | Rev. | Mudança |
 |---|---|
 | R0 | Modelo conceitual com as duas configurações sobrepostas (peças diferentes para F1 e caminhão) |
-| R1 | Peças únicas: banco em quadrilátero articulado, pedaleira basculante e volante em braço pivotado, todos sobre trilhos. Periféricos substituídos pelo Logitech G920 + câmbio. Transição animada via componente dinâmico. Postura caminhão ajustada para eliminar colisões |
-| R2 | Banco dividido em subchassi nivelado (no paralelogramo), assento articulado (25° no F1, paralelo à coxa; 9° no caminhão) e encosto em dois segmentos: lombar reclinável e apoio superior de ombros/cabeça articulado na altura da clavícula, sempre a 75° da horizontal. Posição caminhão inalterada (exceto o encosto, agora mais alto) |
+| R1 | Peças únicas: banco em quadrilátero articulado, pedaleira basculante e volante em braço pivotado, todos sobre trilhos. Periféricos substituídos pelo Logitech G920 + câmbio. Transição animada via componente dinâmico |
+| R2 | Banco com subchassi nivelado, assento inclinável (25° no F1) e encosto em dois segmentos com apoio superior de ombros/cabeça articulado na clavícula |
+| **R3** | Detalhada na lista a seguir |
+
+Mudanças da **R3**:
+
+- **Estrutura:**
+  - **anel estrutural** treliçado a 930 mm do piso;
+  - **barra da porta** removível que abre para cima;
+  - **treliça de soleira** sob a longarina esquerda;
+  - pivô com 3 travessas 30×50;
+  - perfil **30×50×1,2** introduzido.
+- **Balanceamento:** automático do CG sobre o pivô nos dois modos, com o conjunto do caminhão recuado.
+- **Conversão em um movimento por módulo** (opção A, preparada para atuador único — opção B):
+  - **tirante paralelo** no apoio superior;
+  - hastes de acoplamento no banco e na pedaleira;
+  - came no volante;
+  - pinos de trava rápida.
+- **Câmbio** fixo no anel.
+- **Segurança e motores:**
+  - **molas de centragem** de tração como freio econômico;
+  - rolagem do F1 ampliada e do caminhão limitada por software.
+- **Documentação e verificação:**
+  - **identificação** de todas as peças;
+  - **lista de materiais**;
+  - **plano de corte**;
+  - **cálculos**;
+  - verificação geométrica automática.
 
 ---
 
-## 1. Objetivo
+## 1. Objetivo e status
 
-Definir a estrutura de um cockpit de simulação com plataforma móvel. Ele
-deve reproduzir duas posturas de pilotagem bem diferentes, **trocando de
-uma para outra só por articulações, trilhos e encaixes**, sem trocar peças:
+Projetar um cockpit único que assume, só por articulações, trilhos e travas, a posição de pilotagem de um F1 e a de
+um caminhão, sobre uma plataforma móvel de 2 GDL. A R3 fecha os pontos levantados na revisão da R2:
 
-1. **Fórmula 1:** piloto reclinado, pés acima do quadril e volante quase
-   vertical próximo ao peito.
-2. **Caminhão:** piloto sentado ereto, quadril alto, pedais tipo "organ"
-   e volante inclinado.
+- resistência estrutural;
+- centro de gravidade;
+- conversão prática;
+- freio;
+- identificação e fabricação.
 
-A plataforma onde o piloto senta é móvel e reproduz as sensações de
-aceleração, frenagem e força G lateral.
+> **Status:** anteprojeto **verificado por cálculo e por checagem geométrica automática** (seção 12), mas ainda
+> **não revisado por terceiro** nem testado em protótipo. Os valores de catálogo marcados **[Chutando]** em
+> `CALCULOS.md` (curvas de torque, rendimento do redutor) precisam ser trocados pelos dos componentes comprados.
 
-## 2. Referências
+## 2. Documentos do projeto
 
-- Vídeos indicados pelo solicitante:
-  - <https://www.youtube.com/watch?v=L0wX_x7r-9k>
-  - <https://www.youtube.com/watch?v=YZfblU3dd6k>
-  - <https://www.youtube.com/shorts/t1sZWgEWC_w>
-- Dimensões externas oficiais do Logitech G920 (página do fabricante):
-  - **volante:** 270 (A) × 260 (L) × 278 (P) mm, 2,25 kg;
-  - **pedais:** 167 (A) × 428,5 (L) × 311 (P) mm, 3,1 kg.
-- Antropometria aproximada de um adulto de 170–175 cm (seção 4).
-
-## 3. Sistema de coordenadas e convenções
-
-| Eixo | Sentido |
+| Documento | Conteúdo |
 |---|---|
-| **X** | Lateral. Positivo para a **direita** do piloto |
-| **Y** | Longitudinal. Positivo para a **frente** (o piloto olha para +Y). Y = 0 é a traseira da plataforma móvel |
-| **Z** | Vertical. Z = 0 é o piso. **Zp = 380 mm** é o topo do chassi móvel |
+| `docs/MEMORIAL-DESCRITIVO.md` | Este memorial: concepção, mecanismos, decisões |
+| `docs/CALCULOS.md` | Massas, CG, inércias, envoltória, molas, motores, tensões, pinos, frequências, verificação geométrica |
+| `docs/LISTA_DE_MATERIAIS.md` (+ `lista_de_materiais.csv`) | Todas as peças com código, dimensões, corte e massa; comprados agrupados; itens não desenhados |
+| `docs/PLANO_DE_CORTE.md` (+ `plano_de_corte.csv`) | Distribuição das peças de tubo em barras de 6 m |
+| `modelo/gerar_modelo.py` | Gerador paramétrico (fonte única de toda a geometria e dos números) |
+| `ferramentas/verificar.py` | Interferências (transição, porta, manequim) e envoltória de movimento contra a base |
+| `ferramentas/analisar.py` | Cálculos, lista de materiais, plano de corte e o bloco `PRESET` do gerador |
 
-- Sufixos `_E` / `_D` nos nomes das peças: lado esquerdo / direito do piloto.
-- Ângulos de postura são medidos no plano sagital (Y-Z), a partir de +Y
-  em direção a +Z (regra da mão direita em torno de +X).
-- Cores no modelo:
-  - **grafite:** tubo 20×30
-  - **laranja:** tubo 10×20
-  - **azul:** bielas do banco
-  - **vermelho:** abas laterais do banco (quadril, tronco, ombros e cabeça)
-  - **cinza-claro:** chapas, mancais, setores de trava e pinos
-  - **amarelo:** junta cardan
-  - **preto/cinza-escuro:** periféricos G920, motores e estofado
+Os três documentos de números são **gerados** a partir do modelo. Nenhum valor foi digitado à mão.
 
-## 4. Premissas antropométricas (manequim)
+## 3. Sistema de coordenadas, convenções e identificação
 
-O modelo inclui um manequim articulado por posição, no estilo *rigged
-model*: um segmento para cada osso e uma esfera em cada articulação. As
-pernas e o tronco são posicionados por cinemática direta; os braços, por
-cinemática inversa de dois segmentos até as mãos no aro do volante.
+- Milímetros. **X** lateral (direita do piloto = +X), **Y** longitudinal (piloto olha para +Y; traseira da
+  plataforma móvel em Y = 0), **Z** vertical (piso em Z = 0).
+- Topo das longarinas do chassi móvel: **ZP = 380 mm**.
+- Ângulos sagitais medidos a partir de +Y em direção a +Z. "E" = lado esquerdo e "D" = lado direito do piloto.
+- **Códigos de peça:** `<conjunto>-<tipo><nº>`, por exemplo `M-T01`, `BC-PI11` ou `VO-CO05`.
+  - Conjuntos: **B** base, **M** chassi móvel, **A** anel, **PO** barra da porta, **BC** banco, **PE** pedaleira,
+    **VO** volante, **MO** molas.
+  - Tipos: **T** tubo, **CH** chapa/peça usinada, **PI** pino, **CO** comprado, **ES** estofado.
+  - No SketchUp, cada peça se chama `<código> <descrição>` (janela *Outliner*). O mesmo código aparece na lista
+    de materiais, no plano de corte e na etiqueta da peça na bancada.
 
-| Segmento | Comprimento (mm) |
+## 4. Premissas
+
+| Segmento do manequim | Comprimento (mm) |
 |---|---|
 | Coxa / perna | 420 / 420 |
-| Tronco (centro do quadril → linha dos ombros) | 520 |
+| Tronco (quadril → ombros) | 520 |
 | Braço / antebraço + mão | 300 / 310 |
-| Meia-largura do quadril / dos ombros | 90 / 195 |
+| Meia-largura do quadril / ombros | 90 / 195 |
 
-Estatura em pé resultante: **≈ 1730 mm**.
+- Estatura resultante ≈ **1730 mm**.
+- Massa do piloto **90 kg**, distribuída pelos segmentos (frações de Dempster) para o cálculo do CG.
+- **Sem monitores:** a imersão é por óculos de RV, então o modelo não tem monitor nem suporte. O CG fica mais
+  baixo e o volante não precisa deixar campo de visão para tela. A margem de visão sobre o aro foi mantida como
+  critério (35 mm) por conforto.
+- G920: dimensões externas oficiais. As proporções internas (seção do aro, posição dos pedais) são estimadas.
 
 ## 5. Descrição geral
 
-O modelo tem dois conjuntos na raiz:
+```
+                ANEL (z = 930) ───────────────────────────────── câmbio (direita)
+       porta ↑ (abre para cima, lado esquerdo, y 200 → ~1100)
+   ┌──────────────── PLATAFORMA MÓVEL (chassi 30×50, topo z = 380) ────────────────┐
+   │  hastes traseiras (y = 60)        cardan (y = 700)            batentes (y = 1700)│
+   └──────┬──────────────────────────────┬──────────────────────────────────────────┘
+      manivelas + motores            torre do pivô
+   ════════════════════ PLATAFORMA-BASE (piso) ═══════════════════════════════════════
+```
 
-1. **Plataforma-base** (fixa no piso): quadro, torre do pivô, junta
-   cardan, atuadores e batentes. Inalterada desde a R0.
-2. **Plataforma-móvel**: chassi e **três mecanismos de ajuste** (banco,
-   pedaleira e volante), mais o câmbio, que vai preso ao banco.
+| Dimensão | Valor |
+|---|---|
+| Base | 720 × 2050 mm (Y −200 → 1850) |
+| Chassi móvel | 570 × 1780 mm |
+| Anel | ±295 mm, z = 930 mm (ZP + 550) |
+| Topo da cabeça | 1297 mm (F1) / 1825 mm (caminhão) |
+| Massa da estrutura completa (sem piloto) | ≈ 179 kg (lista de materiais) |
+| Massa móvel + piloto | ≈ 220 kg |
 
-As duas plataformas se unem por um **pivô central** (junta cardan, perto do
-centro de gravidade) e por **duas hastes traseiras** ligadas a braços de
-manivela acionados por motores de passo. Os motores no mesmo sentido
-produzem **arfagem**; em sentidos opostos, **rolagem**.
+## 6. Plataforma-base (fixa)
 
-### 5.1 Dimensões gerais
+- **Quadro:** longarinas 20×30 em X = ±330; 10 travessas; diagonal 10×20.
+- **Torre do pivô:**
+  - 4 pernas inclinadas 20×30;
+  - chapa de topo 160×160×15;
+  - **junta cardan** comprada (cruzeta com rolamentos de agulha) com centro em Y = 700, Z = 268. O eixo Y
+    (rolagem) fica no garfo inferior e o eixo X (arfagem) no superior.
+- **Atuadores** (um por lado):
+  - motor NEMA 34 em malha fechada;
+  - redutor planetário 20:1;
+  - **braço de manivela em chapa de aço de 12 mm** (raio 100 mm). A R2 usava tubo 20×30, que veria
+    ≈ 120 MPa cíclicos na força máxima;
+  - terminais rotulares M16 e barra roscada M16 até a plataforma (Y = 60, X = ±310).
+- **Batentes de borracha** dianteiros em Y = 1700: proteção mecânica além do limite de software.
+- **Molas de centragem:** quatro molas de tração com olhais (ver seção 11).
+
+## 7. Plataforma-móvel — estrutura
+
+### 7.1 Chassi
+
+- **Longarinas principais:** 30×50 em X = ±270, Y 0 → 1780.
+- **Travessas:**
+  - 30×50 em Y = 25;
+  - **três travessas 30×50 no pivô** (Y = 650/700/750), sobre a **chapa do pivô 300×140×16** que recebe o
+    garfo superior do cardan;
+  - demais travessas em 20×30;
+  - diagonais de piso 10×20.
+- **Trilhos do banco e da pedaleira:** 30×50 deitados. A R2 tinha os trilhos do banco em 10×20, que ficavam
+  sobrecarregados.
+- **Treliça de soleira (lado esquerdo).** A abertura da porta interrompe a treliça do anel no lado esquerdo. Sem
+  reforço, a força das hastes traseiras chegaria ao pivô só pela longarina em flexão: ≈ 620 MPa na força máxima.
+  - Por isso há uma treliça rasa sob a longarina esquerda: banzo inferior 30×50, montantes e diagonais 20×30.
+  - Nós em Y = 60/300/700/≈1100.
+  - Altura de 60 → 130 → **205** → 60 mm: é máxima no pivô, onde o momento é máximo, e baixa nas pontas para
+    não tocar na base em nenhuma pose.
+
+### 7.2 Anel estrutural
+
+- **Posição:** cota z = 930 mm (ZP + 550). Fica abaixo dos ombros no F1 e serve de base para os reforços do
+  banco, do volante e do câmbio.
+- **Laterais:** treliças com montantes e uma diagonal por vão. Estações à direita em Y = 25/300/700/1050/
+  1450/1765; à esquerda em Y = 25/200, porta, ≈1100/1450/1765.
+- **Quadro dianteiro:** travessa no anel e diagonal.
+- **Quadro traseiro rebaixado:** travessa a z = 760 mm, com diagonal. Ela passa por baixo do apoio de cabeça do
+  F1, que avança além da traseira do chassi. Uma travessa na altura do anel colidiria com o apoio — o primeiro
+  defeito encontrado e corrigido pela verificação automática.
+- **Mastro do volante:** suas colunas deslizam ao longo do anel, entre duas chapas-guia (superior e inferior). O
+  anel funciona como guia e travamento lateral do mastro.
+
+### 7.3 Barra da porta
+
+- **Construção:** tubo 20×30 de ≈ 870 mm entre a dobradiça (Y = 200, montante traseiro esquerdo) e o fecho
+  (Y ≈ 1100).
+- **Abertura:** **gira 85° para cima** em torno de um eixo transversal (X), em vez de abrir para fora como uma
+  porta de automóvel. Assim não ocupa espaço lateral, e o piloto entra passando por cima da soleira e por baixo da
+  barra levantada.
+- **Fecho:** forquilha aberta (duas orelhas e apoio) mais pino de trava rápida (*ball lock*) Ø10. A barra desce
+  para dentro da forquilha e o pino atravessa as três peças.
+- **Animação:** componente dinâmico com atributo próprio **`aberta`**. Clicar na barra com a ferramenta Interagir
+  roda `ANIMATE("aberta",0,1)`.
+- **Resistência:** atende uma pessoa apoiada no meio do vão com 600 N (93 MPa, ver `CALCULOS.md`). Não é
+  degrau.
+
+### 7.4 Câmbio
+
+O câmbio fica fixo no anel direito, sobre uma chapa 190×140×6 com mão-francesa, em Y ≈ 700. Está na posição de
+alcance do caminhão. No F1 usam-se as borboletas do G920, e o câmbio fica fora do caminho dos braços (verificado).
+
+## 8. Conversão F1 ↔ caminhão em um movimento por módulo
+
+Cada módulo (banco, pedaleira, volante) tem **um único grau de liberdade**: ao deslizar o carro, todas as outras
+peças do módulo assumem a pose correta sozinhas, por hastes ou came. Cada módulo trava por **pinos de trava rápida**
+nos trilhos. **Nenhum** ajuste angular é feito à mão.
+
+Esta é a **opção A**. Ela fica pronta para a **opção B** (um atuador linear ou manivela única movendo os três
+carros), porque a relação entre os cursos é fixa: banco +58,5 mm, pedaleira −366 mm, mastro +158 mm.
+
+### 8.1 Banco
+
+| Elemento | Função |
+|---|---|
+| Carro do banco | Desliza nos trilhos 30×50 (curso +58,5 mm) |
+| Paralelogramo | 4 bielas de 360 mm; sobem de 2,1° (F1) a 66,0° (caminhão); o **subchassi** contra-gira e fica sempre a 9° |
+| Tirantes de arrasto (par, 77 mm, X = ±200) | Ligam o chassi à biela traseira: o curso do carro passa a comandar o ângulo das bielas (1 GDL) |
+| Haste do assento (291 mm) | Gira o assento de 25° (F1, paralelo à coxa) para 9° |
+| **Par de hastes do encosto** (275 mm, X = ±100) | Gira o encosto lombar de 35° para 75°. Em par para dividir o momento do encosto e apoiar o carro junto às suas longarinas |
+| **Tirante paralelo do apoio superior** (par, 10×20) | Fecha um paralelogramo com o eixo do encosto: o apoio de ombros/cabeça fica **sempre a 75° da horizontal**, sem trava nem ajuste |
+| Calços de borracha F1 (4) | No F1 as bielas ficam quase deitadas e não devem carregar peso: o subchassi apoia em calços sobre as longarinas principais |
+| Quadros de aço | Assento, encosto e apoio têm quadro 20×30 sob o estofado, onde ficam eixos e alavancas |
+
+### 8.2 Pedaleira
+
+- **Carro** nos trilhos 30×50, com curso de −366 mm.
+- **Base basculante** gira −35° (sola de ~70° para ~35°) em torno do eixo no carro (Y ≈ 1292, Z = ZP + 130).
+- **Haste de comando** de 207 mm: liga uma alavanca no tubo de torção da base a um poste triangulado no chassi.
+- A R2 previa um rasgo em came no centro, que colidia com o próprio carro. Foi substituído, e a haste também
+  dispensa corte a laser.
+- A base foi estreitada para ±200 mm, entre os trilhos, e o G920 sobressai só por cima deles.
+
+### 8.3 Volante
+
+- **Mastro:** duas colunas 30×50 deslizam no chassi (curso +158 mm) e são guiadas pelo anel.
+- **Braço:** gira −35° (aro de 80° para 45°) em torno do tubo de torção, a ZP + 700.
+- **Acoplamento:** um pino seguidor em cada lado corre em **chapa com rasgo curvo** fixa no anel. O rasgo tem
+  exatamente a forma da trajetória do pino, então o giro acompanha o deslize. Aqui o came cabe sem interferência.
+
+### 8.4 Síntese e verificação dos mecanismos
+
+Os pontos fixos das hastes saem de uma **busca com simulação da cinemática real**. Não basta a geometria das duas
+posições extremas: o mecanismo é simulado ao longo de todo o curso. O critério é o **maior braço efetivo** (menor
+força na haste) com **ângulo de transmissão ≥ 25°** em todo o curso.
+
+- Resultado: menor transmissão de **28°**.
+- Erro de posição nas poses finais: **0,0 mm**.
+- Tabela completa em `CALCULOS.md` §7.
+
+## 9. Posturas e balanceamento
+
+| Parâmetro | F1 | Caminhão |
+|---|---|---|
+| Encosto (da horizontal) | 35° | 75° |
+| Assento | 25° (paralelo à coxa) | 9° |
+| Apoio superior | 75° | 75° |
+| Coxa / joelho / tornozelo | +25° / 145° / 100° | +5° / 120° / 90° |
+| Plano do aro | 80° | 45° |
+| Recuo em relação à v2 (balanceamento) | 52 mm | 198 mm |
+
+O gerador recua cada conjunto (banco + pedaleira + volante) ao longo de Y, sem mudar a ergonomia, até o CG
+longitudinal cair sobre o pivô. O erro final é < 1 mm nos dois modos.
+
+- Recuar o caminhão **não** afeta o F1: cada modo tem seu próprio recuo.
+- A postura do caminhão é a mesma da v2, exceto pela translação.
+
+## 10. Componentes dinâmicos e animação
+
+| Atributo | Onde | Efeito |
+|---|---|---|
+| `modo` (0 = F1, 1 = Caminhão) | `Plataforma_Movel` | Clique (Interagir) → `ANIMATE("modo",0,1)`; propagado a todos os filhos por `Parent!modo` |
+| `sentido` (Padrão/Invertido) | `Plataforma_Movel` | Inverte o sinal das rotações, se o SketchUp girar ao contrário |
+| `aberta` (Fechada/Aberta) | `Porta_Barra` | Clique → `ANIMATE("aberta",0,1)` |
+
+- **Leis de movimento:** cada componente que desliza ou gira usa um polinômio cúbico em `modo`, ajustado à
+  cinemática real do mecanismo. Por isso as hastes não "esticam" na animação: o desvio é ≤ 2,3 mm.
+- **Manequins:** o do F1 aparece só em `modo = 0` e o do caminhão só em `modo = 1`.
+- **Teste:** as fórmulas seguem o mesmo esquema da R2, que foi testada no SketchUp desktop. A R3 acrescenta
+  termos polinomiais e o atributo `aberta`, que **ainda não foram testados no desktop** (ponto 13.6).
+
+## 11. Movimento, motores e molas (resumo de `CALCULOS.md`)
 
 | Item | Valor |
 |---|---|
-| Base: comprimento × largura (envelope externo) | 2050 × 680 mm (Y −200 a +1850; X ±340) |
-| Plataforma móvel: comprimento × largura | 1780 × 560 mm |
-| Largura máxima com o câmbio | ~860 mm (o câmbio fica até X = +425) |
-| Topo da cabeça (do piso): F1 / caminhão | ~1300 / ~1825 mm |
+| Massa móvel + piloto | 219,6 kg; CG 454 mm (F1) / 647 mm (caminhão) acima do pivô |
+| Limites de software | arfagem ±7,8°; rolagem F1 **±16,2°** (pura); rolagem caminhão ±6° |
+| Motor / redução | NEMA 34 malha fechada 12 N·m + planetário **20:1**; torque limitado a 6,9 N·m no driver |
+| Desempenho estimado | F1 rolagem ±16° até ≈ 1,07 Hz; ±8° até ≈ 1,57 Hz (≈ 79 °/s) |
+| Força de projeto na haste | 2,5 kN (limitada no driver) |
+| Molas de centragem | par de arfagem: 4,8 N/mm; par de rolagem: 19,2 N/mm; rigidez 1,1 × m·g·h do caminhão |
 
-## 6. Plataforma-base (fixa) — sem alteração na R1
+**Freio econômico:**
 
-| Peça | Perfil | Qtde | Comprimento unit. |
-|---|---|---|---|
-| Longarinas (X = ±330) | 20×30 | 2 | 2050 |
-| Travessas (Y = −190, −120, 40, 560, 840, 1700, 1840) | 20×30 | 7 | 640 |
-| Apoios dos motores (X = ±115) | 20×30 | 2 | 140 |
-| Diagonal | 10×20 | 1 | ~1056 |
-| Torre do pivô (4 pernas convergindo em chapa a Z ≈ 215–228) | 20×30 | 4 | ~265 |
+- **Molas de tração:**
+  - deixam a plataforma estável com os motores desligados;
+  - reduzem o torque estático no F1;
+  - só puxam para baixo, então o cardan nunca é tracionado.
+- **Frenagem dinâmica dos drivers**, sem custo.
+- **Botão de emergência**, que corta o *enable*.
+- **Batentes de borracha.**
+- **Freio eletromagnético:** fica opcional, conforme o resultado do protótipo.
 
-- **Junta cardan:** em X = 0, Y = 700, Z ≈ 285. Permite **rolagem** (eixo Y)
-  e **arfagem** (eixo X). Na fabricação, usar uma cruzeta comercial com
-  rolamentos de agulha.
-- **Atuadores (×2):** NEMA 34 com redutor planetário, manivela de 100 mm
-  (eixo em Y = −40, Z = 160), haste vertical Ø16 com rótulas nas duas
-  pontas, em X = ±310, Y = 60.
-- **Batentes dianteiros:** colunas em X = ±270 sobre a travessa Y = 1700,
-  com borracha no topo em Z = 175. Folga de 175 mm até o chassi móvel.
+## 12. Verificações realizadas
 
-## 7. Plataforma-móvel
-
-### 7.1 Chassi (fixo em relação à plataforma)
-
-| Peça | Perfil | Qtde | Posição | Comprimento |
-|---|---|---|---|---|
-| Longarinas principais | 20×30 | 2 | X = ±270, Z 350–380 | 1780 |
-| Travessas principais | 20×30 | 3 | Y = 15, 700 (pivô), 1765 | 520 |
-| Travessas secundárias | 10×20 | 3 | Y = 350, 1100, 1450 | 520 |
-| Trilhos do banco | 10×20 | 2 | X = ±150, Y 5 → 1110 | 1105 |
-| Trilhos da pedaleira (**estendidos na R1**) | 10×20 | 2 | X = ±230, Y 880 → 1775 | 895 |
-
-Os trilhos têm furação para os **pinos de trava** dos carros. As
-longarinas principais servem de trilho para as abraçadeiras do mastro do
-volante.
-
-### 7.2 Princípio dos mecanismos de ajuste
-
-Cada conjunto ajustável vai de F1 para caminhão com **um único giro em
-torno de uma articulação** mais **um único deslocamento em trilho**. A
-posição de cada articulação foi **calculada** (síntese de mecanismo no
-script) para que esse par giro + deslocamento leve a peça **exatamente** da
-pose F1 à pose caminhão. O erro verificado é de 0 mm no calcanhar e no
-centro do volante. Nas duas pontas, a posição é travada por pino em
-**setores furados** (articulações) e em **furos dos trilhos** (carros).
-
-### 7.3 Banco — quadrilátero articulado, assento inclinável e encosto em dois segmentos
-
-O banco tem quatro partes móveis, todas articuladas no mesmo eixo **C**
-(canto assento/encosto) ou sobre ele:
-
-| Elemento | Especificação |
-|---|---|
-| Carro do banco | 2 tubos 20×30 (X = ±150) + 2 travessas, deslizando nos trilhos do banco. Curso **+260 mm** (ocupa Y 283–969) |
-| Bielas | 4 bielas 20×30 de **360 mm** entre pinos (azuis), em X = ±180, formando um paralelogramo. Ângulo **5,3° (F1) → 75,6° (caminhão)** |
-| Subchassi | Sempre a **9°**, sustentado pelo paralelogramo: 2 longarinas 20×30 de 360 mm (X = ±262) com montantes até o eixo C, onde estão os setores de trava do assento e do encosto. O câmbio é preso aqui |
-| Assento | 480 × 440 × 60 mm, articulado em C: **25° no F1** (paralelo à coxa) → **9° no caminhão** (giro de −16°), com trava por pino em setor furado |
-| Encosto lombar | 480 × 563 mm, articulado em C: **35° (F1) → 75° (caminhão)** em relação à horizontal (giro de −40°) |
-| Apoio superior (ombros/cabeça) | 480 × 430 mm, com abas de ombro (X = ±245 a ±275) e abas de cabeça (X = ±112 a ±142). Articulado no encosto a **563 mm do eixo C, na altura da clavícula** do manequim F1. Fica **sempre a 75° da horizontal**: gira +40° em relação ao encosto, que gira −40° |
-| Elevação resultante | o quadril sobe **307 mm** (Zp + 290 → Zp + 597) |
-
-**Efeito no F1:**
-- o assento a 25° acompanha a coxa: fica um colchão de 29 mm entre a
-  superfície do assento e a coxa;
-- o encosto lombar segue reclinado a 35°, enquanto o apoio superior se
-  dobra 40° para a frente e fica atrás dos ombros (26 mm) e da nuca
-  (7 mm, praticamente encostada), como a concha de um banco de F1.
-
-**Efeito no caminhão:** o assento volta a 9° e o apoio superior fica
-alinhado com o encosto. O resultado é um encosto alto e reto (~990 mm a
-partir de C), com apoio de cabeça.
-
-Na R0, a altura do banco dependia de colunas telescópicas que precisariam
-ir de ~25 mm a ~330 mm, o que não é fabricável. O paralelogramo resolve a
-elevação. Na R2, o assento e o encosto ganharam articulações próprias, de
-modo que o ângulo de cada um deixou de depender do paralelogramo.
-
-### 7.4 Câmbio (Driving Force Shifter)
-
-- Fica sobre uma chapa de 140 × 190 mm, num suporte 20×30 parafusado na
-  longarina direita do **subchassi**: centro em X = +360, cerca de 150 mm à
-  frente do eixo C.
-- Como o subchassi não inclina, o câmbio **acompanha o banco e fica sempre
-  nivelado**, nas duas posições.
-- Dimensões usadas: 130 × 165 × 167 mm (estimativa; o fabricante não
-  publica a medida, conferir na peça).
-
-### 7.5 Pedaleira — base basculante sobre carro (pedais G920)
-
-| Elemento | Especificação |
-|---|---|
-| Carro da pedaleira | 2 tubos 20×30 (X = ±230) + travessa, com duas torres de pivô |
-| Pivô da base | Y = 1344 (na posição F1), Zp + 130 |
-| Giro da base | **−35°**: a sola passa de ~70° (F1) para ~35° (caminhão) em relação à horizontal |
-| Curso do carro | **−220 mm** (recua na posição caminhão) |
-| Base | chapa de fixação 436 × 331 mm para a **unidade de pedais G920** (428,5 × 311 × 167 mm), presa por dois braços 20×30 de cada lado (X = ±250) e duas travessas |
-| Pedais | embreagem / freio / acelerador com passo de 125 mm (estimativa), centrados entre os pés |
-
-### 7.6 Volante — braço pivotado sobre mastro deslizante (volante G920)
-
-| Elemento | Especificação |
-|---|---|
-| Mastro | 2 colunas 20×30 em abraçadeiras que correm sobre as longarinas (X = ±270) + travessa 20×30 |
-| Pivô do braço | Y = 1237 (na posição F1), **Zp + 710** |
-| Giro do braço | **−35°**: o plano do aro passa de **80° (F1) para 45° (caminhão)** |
-| Curso do mastro | **+310 mm** (avança na posição caminhão) |
-| Braço | 4 tubos 20×30 entre o pivô e a **mesa do volante**; balanço de ~600 mm até o centro do aro |
-| Mesa | chapa de 300 × 240 mm onde a base do G920 é fixada (grampos/parafusos) |
-| Volante | base G920 260 × 232 × 190 mm (proporção estimada sobre as medidas oficiais), aro Ø270 |
-
-O aro do G920 é fixo em relação à base, a ~80° da face de apoio
-(estimativa). Por isso o ajuste de ângulo é feito **inclinando a mesa**.
-
-### 7.7 Verificações de interferência (modelo R1)
+`ferramentas/verificar.py`:
 
 | Verificação | Resultado |
 |---|---|
-| Base e aro do G920 × coxas/joelhos (caminhão) | 45 mm ✔ |
-| Travessa do mastro × pernas (F1 / caminhão) | 210 / 331 mm ✔ |
-| Travessa do mastro abaixo da linha de visão olho → topo do aro | 35 mm de margem ✔ |
-| Base dos pedais acima do topo do chassi (caminhão) | 26 mm ✔ |
-| Carro do banco dentro do trilho (Y 5–1110) | ocupa Y 283–969 ✔ |
-| Assento (F1) × biela traseira | 9 mm ✔ (justo) |
-| Coxa × assento (F1) | 29 mm de colchão ✔ |
-| Nuca / ombros × apoio superior (F1) | 7 / 26 mm ✔ |
-| Carro da pedaleira dentro do trilho (Y 880–1775) | ocupa Y 1034–1484 ✔ |
-| Mastro sobre as longarinas | Y 1237 → 1547 ✔ |
+| Interferência entre peças de componentes diferentes, em 5 pontos da transição | 0 |
+| Barra da porta aberta e a meio curso, nos dois modos | 0 |
+| Manequim × estrutura, nos dois modos | 0 (mãos no aro desconsideradas) |
+| Plataforma × base em 340 poses alcançáveis | único contato: batentes dianteiros a ≈ −8,4° de arfagem (previsto); menor folga restante ≈ 14 mm |
 
-## 8. Posturas de pilotagem
+Defeitos da proposta inicial da v3 encontrados e corrigidos por essas verificações e pelos cálculos:
 
-| Parâmetro | Fórmula 1 | Caminhão |
-|---|---|---|
-| Quadril: Y; altura acima de Zp | 650; 290 | 700; **597** |
-| Encosto (a partir da horizontal) | 35° | 75° |
-| Inclinação do assento | **25°** (paralelo à coxa) | 9° |
-| Apoio superior (ombros/cabeça) | 75° (dobrado 40° sobre o encosto) | 75° (alinhado com o encosto) |
-| Coxa / joelho / tornozelo | +25° / 145° / 100° | +5° / 120° / 90° |
-| Sola (base dos pedais) | ~70° | ~35° |
-| Plano do aro do volante | 80° | **45°** |
-| Pegada das mãos | 9 h e 3 h | 10 h e 2 h |
-| Distância ombro → mão | ~428 mm | ~516 mm |
+- apoio de cabeça do F1 × travessa traseira do anel;
+- cotovelos × diagonal do anel;
+- mastro × diagonais;
+- came central × carro da pedaleira;
+- base da pedaleira × trilhos;
+- longarina × placas dos motores;
+- haste do encosto × almofada;
+- longarina esquerda sem treliça (620 MPa);
+- chapa do pivô (151 MPa);
+- poste da haste da pedaleira em balanço (587 MPa);
+- alavanca do encosto (440 MPa);
+- haste do encosto com braço curto (12,8 kN);
+- assento/encosto sem quadro de aço.
 
-**Ajustes feitos na postura caminhão para eliminar colisões com o G920:**
-quadril +60 mm, aro a 45° em vez de 35°, volante 40 mm mais à frente e
-132 mm mais alto em relação ao ombro.
+## 13. Pontos em aberto (verificar antes de fabricar)
 
-## 9. Componentes dinâmicos e animação (ANIMATE)
+1. **Curvas dos motores e rendimento do redutor** são típicas de catálogo. Refazer a tabela da seção 5 de
+   `CALCULOS.md` com o datasheet do motor comprado.
+2. **Junta cardan:** especificar a cruzeta pela carga de projeto (≈ 11 kN no pico, ver `CALCULOS.md`), com
+   capacidade estática ≥ 20 kN. Uma cruzeta automotiva de cardan leve atende, mas os garfos são fabricados.
+3. **Molas de tração** de 19,2 N/mm com ≈ 120 mm de alongamento máximo: confirmar com o fabricante. São molas sob
+   encomenda, de custo baixo.
+4. **Soldas:** a fadiga foi avaliada com Δσ ≤ 50 MPa. Pede solda contínua, sem mordedura, nos nós da treliça de
+   soleira e das travessas do pivô.
+5. **Buchas** em todos os furos de articulação: os tubos de 1,2 mm não aguentam pino direto por muito tempo.
+6. **Animação no SketchUp desktop:** testar `modo` e `aberta` no arquivo R3. Se alguma peça girar ao contrário,
+   usar `sentido`.
+7. **Comprimentos de corte** são os do eixo, de face a face. Cortar com +2 mm e ajustar no gabarito; nas peças
+   com corte em ângulo, conferir o ângulo na montagem.
+8. **Estofados:** espessuras e abas são propostas. O assento e o apoio superior são o que mais precisa de prova
+   com o usuário real.
+9. **Opção B** (atuador único): exige projetar as ligações entre os três carros. Os cursos já estão fixados.
 
-Os mecanismos são **componentes dinâmicos** do SketchUp, controlados por
-um atributo `modo` (0 = F1, 1 = caminhão) no componente `Plataforma_Movel`.
-
-| Componente | Fórmula (resumo) |
-|---|---|
-| `Plataforma_Movel` | `modo` (lista F1/Caminhão), `sentido` (1 / −1); **onClick = `ANIMATE("modo",0,1)`** |
-| `Carro_Banco`, `Carro_Pedaleira`, `Mastro_Volante` | `Y = Y0 + modo × curso` |
-| `Biela_Banco_*` | `RotX = modo × sentido × 70,3°` |
-| `Banco` (subchassi) | `RotX = −modo × sentido × 70,3°` (contra-rotação: o subchassi fica nivelado) |
-| `Assento` | `RotX = modo × sentido × (−16°)` |
-| `Encosto` | `RotX = modo × sentido × (−40°)` |
-| `Encosto_Superior` | `RotX = modo × sentido × (+40°)` (compensa o encosto: ângulo absoluto constante) |
-| `Pedaleira_Basculante` / `Braco_Volante` | `RotX = modo × sentido × (−35°)` |
-| `Manequim_F1` / `Manequim_Caminhao` | `Hidden` fora de `modo = 0` / `modo = 1` |
-
-**Como usar (SketchUp desktop):**
-1. Selecione a ferramenta **Interagir** (ícone de mão).
-2. Clique na plataforma móvel: os carros deslizam, as bielas giram, o
-   encosto reclina e a pedaleira e o volante basculam até a posição
-   caminhão. O assento baixa a frente e o apoio superior se endireita.
-  Clique de novo para voltar ao F1.
-3. Para escolher a posição sem animar, use **Janela → Opções do
-   componente** (*Component Options*) e o campo "Posição de pilotagem".
-
-Durante a transição os manequins ficam ocultos: eles representam o piloto
-em cada posição final e não são animados.
-
-## 10. Cinemática da plataforma móvel
-
-| Grandeza | Valor | Observação |
-|---|---|---|
-| Raio da manivela | 100 mm | |
-| Distância pivô → hastes (longitudinal / lateral) | 640 / 310 mm | |
-| **Arfagem máxima** | **±8,9°** | |
-| **Rolagem máxima (geométrica)** | **±17,9°** | Limitar a ±8–10° no software |
-| Curso na frente da plataforma | ±169 mm | Folga até os batentes: 175 mm |
-
-## 11. Lista de tubos (estimativa)
-
-Comprimentos medidos no modelo 3D. Cada peça ajustável aparece **uma vez**,
-porque agora é a mesma peça nas duas posições.
-
-| Conjunto | Tubo 20×30 | Tubo 10×20 |
-|---|---|---|
-| Plataforma-base | 17 peças, 10,14 m | 1 peça, 1,06 m |
-| Chassi móvel | 5 peças, 5,12 m | 7 peças, 5,56 m |
-| Banco (carro, 4 bielas, subchassi, suporte do câmbio) | 13 peças, 3,96 m | — |
-| Pedaleira (carro, torres, braços, travessas) | 11 peças, 3,79 m | — |
-| Volante (mastro, travessa, braços) | 7 peças, 3,82 m | — |
-| **Subtotal** | **26,8 m** | **6,6 m** |
-| **Com 10% de perdas** | **≈ 29,5 m** | **≈ 7,3 m** |
-
-Não incluídos: chapas, mancais, setores de trava, pinos (Ø16–20),
-cardan, rótulas, motores e redutores, banco, periféricos.
-
-## 12. Pontos em aberto e recomendações (obrigatório verificar antes de fabricar)
-
-1. **Centro de gravidade no modo caminhão** (*crítico, piorou na R1*). O
-   quadril agora sobe 307 mm entre F1 e caminhão, e o CG fica bem acima da
-   cruzeta. Recomendações:
-   - torre do pivô com altura regulável, **ou**
-   - motores e redutores dimensionados pelo modo caminhão.
-2. **Componentes dinâmicos.**
-   - A animação da R1 foi testada pelo solicitante no SketchUp desktop e
-     funcionou com "Sentido" = Padrão.
-   - As articulações novas da R2 (assento e apoio superior) usam a mesma
-     convenção, mas ainda precisam ser conferidas.
-   - Se alguma peça girar **para o lado errado**, troque "Sentido" para
-     "Invertido" nas Opções do componente.
-   - Não está confirmado que o SketchUp para Web suporta Interagir.
-3. **Medidas internas do G920.** Só as dimensões externas são oficiais.
-   Antes de furar as chapas, conferir na peça:
-   - o ângulo do aro em relação à base;
-   - a furação de fixação do volante e dos pedais;
-   - o passo dos pedais;
-   - as medidas do câmbio.
-4. **Braço do volante em balanço (~600 mm).** O G920 tem pouco torque
-   (2,3 N·m), mas a vibração e a flexão do braço precisam de verificação.
-   Se necessário, use tubos de parede maior ou um tirante diagonal.
-5. **Espessura de parede dos tubos.** Mínimo de 2,0 mm no 20×30 das bielas,
-   da torre, das longarinas e dos carros; 1,2–1,5 mm no 10×20.
-6. **Travas.** Os pinos das bielas e dos setores carregam o peso do piloto.
-   O apoio superior recebe a carga da cabeça e dos ombros em frenagens e
-   curvas; o setor da clavícula precisa de pino passante e chapa dupla.
-   Recomendações:
-   - pinos com Ø ≥ 16 mm em aço;
-   - bielas com bucha;
-   - trava redundante (pino + parafuso) no modo caminhão, em que as bielas
-     ficam quase verticais.
-7. **Dimensionamento dos motores** (torque estático e dinâmico, margem
-   contra perda de passo) e **limites de software** (rolagem ±8–10°, fins
-   de curso).
-8. **Segurança:**
-   - parada de emergência;
-   - proteção das manivelas;
-   - partida dos motores sempre na posição neutra;
-   - nunca trocar de modo com a plataforma energizada.
-
-## 13. Organização do modelo 3D
+## 14. Organização do modelo 3D
 
 ```
-Plataforma_Base (grupo, tag Plataforma_Base)
-Plataforma_Movel (componente dinâmico, tag Plataforma_Movel)
-├── Chassi_Movel
-├── Carro_Banco
-│   ├── Biela_Banco_E_Tras
-│   │   └── Banco (subchassi) ── G920_Cambio
-│   │       ├── Assento
-│   │       └── Encosto
-│   │           └── Encosto_Superior
-│   ├── Biela_Banco_D_Tras
-│   ├── Biela_Banco_E_Diant
-│   └── Biela_Banco_D_Diant
-├── Carro_Pedaleira
-│   └── Pedaleira_Basculante
-│       └── G920_Pedais
-├── Mastro_Volante
-│   └── Braco_Volante
-│       └── G920_Volante
-├── Manequim_F1        (tag Manequim)
-└── Manequim_Caminhao  (tag Manequim)
+Plataforma_Base (grupo)            quadro, torre, cardan, motores, manivelas, molas, batentes
+Plataforma_Movel (DC: modo, sentido)
+├─ geometria do chassi, anel, soleira, câmbio, chapas de came, calços F1
+├─ Carro_Banco → Biela_Banco_* → Banco → Assento / Encosto → Encosto_Superior
+│                                      → Tirante_Apoio_E/D
+│  Haste_Encosto_E/D, Haste_Assento, Tirante_Carro_E/D
+├─ Carro_Pedaleira → Pedaleira_Basculante ; Haste_Pedaleira
+├─ Mastro_Volante → Braco_Volante
+├─ Porta_Barra (DC: aberta)
+└─ Manequim_F1 / Manequim_Caminhao
 ```
-
-**Cenas salvas no arquivo:**
 
 | Cena | Mostra |
 |---|---|
-| `Vista 3/4` | Vista dianteira-esquerda |
-| `Vista Lateral` | Vista lateral esquerda |
-| `Mecanismos (sem manequim)` | Vista lateral sem os manequins |
-| `Base e Atuadores` | Somente a plataforma-base |
+| `Vista 3/4` / `Vista Lateral` | Conjunto completo |
+| `Mecanismos (sem manequim)` | Mecanismos sem os manequins |
+| `Base e Atuadores` | Somente a base, motores, manivelas e molas |
 
-`G920_Volante`, `G920_Pedais` e `G920_Cambio` são componentes que podem
-ser trocados por um modelo detalhado: clique direito → *Recarregar*.
+## 15. Regeneração
 
-## 14. Regeneração do modelo
-
-`modelo/gerar_modelo.py` é **paramétrico**:
-
-- as posturas estão em `POSE_F1` e `POSE_TRK`;
-- as medidas dos periféricos estão nas constantes `G920_*`;
-- os pivôs e cursos dos mecanismos são **recalculados** a cada execução.
-
-O resultado da execução traz um relatório de verificação, com erro de
-síntese, folgas e cursos. O script roda no ambiente Python do conector
-**Trimble SketchUp MCP** (`build_model`), e não no console Ruby do SketchUp
-desktop. Veja o `README.md`.
+1. **Localmente**, rode `python3 ferramentas/verificar.py` e `python3 ferramentas/analisar.py`. Eles:
+   - rodam as buscas completas dos mecanismos;
+   - conferem interferências;
+   - regeneram os documentos;
+   - gravam o bloco `PRESET` no gerador.
+2. **No SketchUp**, envie `modelo/gerar_modelo.py` como `code` do conector Trimble SketchUp MCP (`build_model`,
+   `clean: true`) e salve com `save_model`.
+   - O ambiente do conector encerra scripts em 30 s. Com `PRESET` preenchido, o gerador só avalia a solução já
+     encontrada, sem repetir as buscas.
+   - O ambiente também não tem `any()`/`all()` e não guarda variáveis entre chamadas. Se precisar dividir o
+     envio, passe os dados por `session_state`.
