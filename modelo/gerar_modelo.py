@@ -199,10 +199,21 @@ def part(nd, asm, kind, desc, geom, mat, mass, centroid, prof=None, length=None,
     return PARTS[-1]
 
 def tube(nd, asm, desc, p0, p1, prof="20x30", up=(0, 0, 1), cut=None, group=None, mat=None):
-    """Rectangular tube on the centreline p0 -> p1. Its drawn length is its cut length."""
+    """Rectangular tube on the centreline p0 -> p1.
+
+    geom[5] is the tube's `info` dict: its section frame (a = axis, u = width
+    direction of extent su, v = height direction of extent sv), the two end cuts
+    (None = square, else a plane (point, outward normal): the tube keeps the side
+    where (P - point).normal <= 0) and, once resolve_joints() has run, the eight
+    corner points of the cut tube. The part's length / mass / centroid are
+    updated by resolve_joints() to the cut values."""
     L = v_len(v_sub(p1, p0))
-    return part(nd, asm, "T", desc, ("tube", p0, p1, prof, up), mat or ("T_" + prof), prof_kgm(prof) * L / 1000.0,
-                v_lerp(p0, p1, 0.5), prof=prof, length=L, line=(p0, p1), cut=cut, group=group)
+    xa, ya, za = axes_from(v_sub(p1, p0), up)
+    w, h, wall = PROFILES[prof]
+    info = dict(p0=p0, p1=p1, a=xa, u=ya, v=za, su=w, sv=h, wall=wall, prof=prof, cuts=[None, None], pts=None)
+    return part(nd, asm, "T", desc, ("tube", p0, p1, prof, up, info), mat or ("T_" + prof),
+                prof_kgm(prof) * L / 1000.0, v_lerp(p0, p1, 0.5), prof=prof, length=L, line=(p0, p1), cut=cut,
+                group=group)
 
 def box(nd, asm, kind, desc, o, xa, ya, za, ext, mat, mass=None, spec=None, group=None, bom=True):
     """Oriented box, ext = (x0, y0, z0, x1, y1, z1) in the frame (o, xa, ya, za)."""
@@ -239,6 +250,191 @@ def pin(nd, asm, desc, c, half, r=8.0):
 # ----------------------------------------------------------------------------
 # Kinematics of the node tree (pure Python, mirrors the DC formulas)
 # ----------------------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
+# Welded joints. Tubes of one node are welded into one rigid weldment. Every
+# tube end is resolved into one of three cuts, so tubes meet face to face and
+# never cross each other:
+#   - mitre: two tubes of the same section end at one node (corners, V joints);
+#     both are cut on the bisector plane;
+#   - butt: the tube ends on a face of a larger / better supported tube and is
+#     cut on the plane of that face;
+#   - square: free end, or a tube that is itself the support of the others.
+# ----------------------------------------------------------------------------
+
+JOINT_TOL = 2.5               # mm: how far from a host an end may be and still weld to it
+
+
+def _ti(pt):
+    return pt["geom"][5]
+
+
+def _t_local(ti, P):
+    d = v_sub(P, ti["p0"])
+    return (v_dot(d, ti["a"]), v_dot(d, ti["u"]), v_dot(d, ti["v"]))
+
+
+def _t_len(ti):
+    return v_len(v_sub(ti["p1"], ti["p0"]))
+
+
+def _t_area(ti):
+    return ti["su"] * ti["sv"]
+
+
+def _t_ext(ti, r):
+    """Extent of the tube section along the unit vector r (r normal to the axis)."""
+    return ti["su"] * abs(v_dot(ti["u"], r)) + ti["sv"] * abs(v_dot(ti["v"], r))
+
+
+def _butt_plane(hi, E, d):
+    """Face plane of the host `hi` that the tube ending at E (outward direction d) lands on."""
+    h_u, h_v, h_a = hi["u"], hi["v"], hi["a"]
+    faces = [(h_u, v_add(hi["p0"], v_mul(h_u, hi["su"] / 2.0))), (v_mul(h_u, -1.0), v_sub(hi["p0"], v_mul(h_u, hi["su"] / 2.0))),
+             (h_v, v_add(hi["p0"], v_mul(h_v, hi["sv"] / 2.0))), (v_mul(h_v, -1.0), v_sub(hi["p0"], v_mul(h_v, hi["sv"] / 2.0))),
+             (v_mul(h_a, -1.0), hi["p0"]), (h_a, hi["p1"])]
+    best = None
+    for n, Q in faces:
+        if v_dot(n, v_mul(d, -1.0)) < 0.2:
+            continue
+        dist = abs(v_dot(v_sub(E, Q), n))
+        if best is None or dist < best[0]:
+            best = (dist, Q, n)
+    if best is None:
+        return None, 0.0
+    return (best[1], v_mul(best[2], -1.0)), best[0]
+
+
+def _touches(ti, E, hi):
+    """True when the end face of `ti` (centre E) lies flat against / within JOINT_TOL of tube `hi`."""
+    s, x, y = _t_local(hi, E)
+    L = _t_len(hi)
+    ds = max(-s, s - L, 0.0) - _t_ext(ti, hi["a"]) / 2.0
+    dx = max(abs(x) - hi["su"] / 2.0, 0.0) - _t_ext(ti, hi["u"]) / 2.0
+    dy = max(abs(y) - hi["sv"] / 2.0, 0.0) - _t_ext(ti, hi["v"]) / 2.0
+    return math.sqrt(max(ds, 0.0) ** 2 + max(dx, 0.0) ** 2 + max(dy, 0.0) ** 2) <= JOINT_TOL
+
+
+def _resolve_end(T, e, tubes, report):
+    ti = _ti(T)
+    if ti["cuts"][e] is not None:
+        return
+    E = ti["p0"] if e == 0 else ti["p1"]
+    d = v_mul(ti["a"], -1.0 if e == 0 else 1.0)
+    inter, ends = [], []
+    for H in tubes:
+        if H is T:
+            continue
+        hi = _ti(H)
+        if abs(v_dot(ti["a"], hi["a"])) > 0.985:
+            continue                                   # parallel: never a welded T or corner joint
+        s, x, y = _t_local(hi, E)
+        L = _t_len(hi)
+        if s < -JOINT_TOL or s > L + JOINT_TOL or abs(x) > hi["su"] / 2.0 + JOINT_TOL or abs(y) > hi["sv"] / 2.0 + JOINT_TOL:
+            continue
+        m = max(hi["su"], hi["sv"]) / 2.0
+        if m <= s <= L - m:
+            inter.append(H)
+        else:
+            ends.append((H, 0 if s < L / 2.0 else 1))
+    if inter:
+        H = max(inter, key=lambda q: _t_area(_ti(q)))
+        if _t_area(ti) > _t_area(_ti(H)) + 1e-6:
+            report.append("%s end %d: larger than its host %s" % (T["id"], e, H["id"]))
+            return
+        cut, dist = _butt_plane(_ti(H), E, d)
+        if cut is None:
+            report.append("%s end %d: no face of %s faces it" % (T["id"], e, H["id"]))
+        else:
+            ti["cuts"][e] = cut
+            if dist > 12.0:
+                report.append("%s end %d: %.0f mm from the face of %s" % (T["id"], e, dist, H["id"]))
+        return
+    if ends:
+        for H, he in ends:
+            hi = _ti(H)
+            if hi["cuts"][he] is not None:
+                continue
+            if abs(ti["su"] - hi["su"]) > 0.1 or abs(ti["sv"] - hi["sv"]) > 0.1:
+                if abs(ti["su"] - hi["sv"]) > 0.1 or abs(ti["sv"] - hi["su"]) > 0.1:
+                    continue
+            d2 = v_mul(hi["a"], -1.0 if he == 0 else 1.0)
+            r = v_cross(d, d2)
+            if v_len(r) < 1e-3:
+                continue
+            r = v_norm(r)
+            if abs(_t_ext(ti, r) - _t_ext(hi, r)) > 1.0:
+                continue
+            n_out = v_norm(v_sub(d, d2))
+            Q = v_lerp(E, ti["p0"] if he == 0 and False else (hi["p0"] if he == 0 else hi["p1"]), 0.5)
+            ti["cuts"][e] = (Q, n_out)
+            hi["cuts"][he] = (Q, v_mul(n_out, -1.0))
+            return
+        best = None
+        for H, he in ends:
+            hi = _ti(H)
+            if (_t_area(ti), _t_len(ti)) >= (_t_area(hi), _t_len(hi)):
+                continue
+            cut, dist = _butt_plane(hi, E, d)
+            if cut is None:
+                continue
+            # how far this plane leaves the tube extended along d (the most trimmed plane wins)
+            lams = []
+            for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+                c = v_add(ti["p0"], v_add(v_mul(ti["u"], sx * ti["su"] / 2.0), v_mul(ti["v"], sy * ti["sv"] / 2.0)))
+                lams.append(v_dot(v_sub(cut[0], c), cut[1]) / v_dot(ti["a"], cut[1]))
+            reach = max(lams) if e == 1 else -min(lams)
+            if best is None or reach < best[0]:
+                best = (reach, cut, dist, H)
+        if best is not None:
+            ti["cuts"][e] = best[1]
+            if best[2] > 12.0:
+                report.append("%s end %d: %.0f mm from the face of %s" % (T["id"], e, best[2], best[3]["id"]))
+            return
+    for H in tubes:
+        if H is not T and _touches(ti, E, _ti(H)):
+            return                                     # flat contact (side-by-side weld): square cut stays
+    report.append("%s end %d: free" % (T["id"], e))
+
+
+def _finish_tube(T):
+    ti = _ti(T)
+    a, u, v = ti["a"], ti["u"], ti["v"]
+    pts = [[], []]
+    for k in (0, 1):
+        cut = ti["cuts"][k]
+        Q, n = (ti["p0"], v_mul(a, -1.0)) if k == 0 else (ti["p1"], a)
+        if cut is not None and abs(v_dot(a, cut[1])) > 0.05:
+            Q, n = cut
+        for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+            c = v_add(ti["p0"], v_add(v_mul(u, sx * ti["su"] / 2.0), v_mul(v, sy * ti["sv"] / 2.0)))
+            lam = v_dot(v_sub(Q, c), n) / v_dot(a, n)
+            pts[k].append(v_add(c, v_mul(a, lam)))
+    ti["pts"] = pts
+    lens = [v_len(v_sub(pts[1][i], pts[0][i])) for i in range(4)]
+    T["length"] = max(lens)
+    T["mass"] = prof_kgm(T["prof"]) * (sum(lens) / 4.0) / 1000.0
+    cx = [sum(q[i] for q in pts[0] + pts[1]) / 8.0 for i in range(3)]
+    T["centroid"] = (cx[0], cx[1], cx[2])
+
+
+def resolve_joints():
+    """Cut every welded tube end (see above) and compute the cut tube geometry."""
+    groups = {}
+    for pt in PARTS:
+        if pt["kind"] == "T":
+            groups.setdefault(pt["node"], []).append(pt)
+    report = []
+    # larger / longer tubes first: they are the hosts, the rest butt onto them
+    for nd_, tubes in groups.items():
+        for T in sorted(tubes, key=lambda q: (-_t_area(_ti(q)), -_t_len(_ti(q)))):
+            for e in (0, 1):
+                _resolve_end(T, e, tubes, report)
+    for tubes in groups.values():
+        for T in tubes:
+            _finish_tube(T)
+    GEO["joint_report"] = report
+
 
 def node_tf(key, m, door=0.0):
     """World transform of a node at modo = m (door = door opening 0..1):
@@ -425,7 +621,7 @@ CARR_TOP = RAIL_TOP + 30.0
 COARSE = False                # coarse mechanism searches (used while balancing)
 
 # >>> PRESET (written by ferramentas/analisar.py - do not edit by hand)
-PRESET = {'kl': 80, 'drag_gy': 350, 'back_cand': 33, 'back_gy': 470, 'pan_cand': 5, 'pan_gy': 460, 'ped_ll': 240, 'ped_ang': 180, 'ped_gz': 680, 'shift': [-17.785, -170.666]}
+PRESET = {'kl': 80, 'drag_gy': 350, 'back_cand': 33, 'back_gy': 461, 'pan_cand': 5, 'pan_gy': 461, 'ped_ll': 240, 'ped_ang': 180, 'ped_gz': 680, 'shift': [-17.397, -170.775]}
 # <<< PRESET
 # The SketchUp sandbox stops a script after 30 s, which is less than the
 # mechanism searches take. When EMIT is on and PRESET holds the solution found
@@ -454,11 +650,12 @@ def build(shift_f1, shift_trk):
     for s in (-1, 1):
         sd = "E" if s < 0 else "D"
         tube(B, "B", "Longarina base " + sd, (s * 330, Y0, 15), (s * 330, Y1, 15), "20x30")
-    for y in (-190.0, 40.0, 300.0, 560.0, 840.0, 1100.0, 1700.0, 1840.0):
+    for y in (-190.0, 40.0, 300.0, 560.0, 650.0, 840.0, 1100.0, 1700.0, 1840.0):
         tube(B, "B", "Travessa base y%d" % int(y), (-320, y, 15), (320, y, 15), "20x30")
-    tube(B, "B", "Diagonal base", (-320, 850, 15), (320, 1690, 15), "10x20", cut="angulo")
+    tube(B, "B", "Diagonal base", (-290, 1100, 15), (290, 1700, 15), "10x20", cut="angulo")
     for s in (-1, 1):
-        tube(B, "B", "Apoio motor " + ("E" if s < 0 else "D"), (s * 115, -110, 15), (s * 115, 30, 15), "20x30")
+        tube(B, "B", "Apoio motor " + ("E" if s < 0 else "D"), (s * 115, -190, 15), (s * 115, 30, 15), "20x30")
+        tube(B, "B", "Longarina apoio chapa motor " + ("E" if s < 0 else "D"), (s * 292, -190, 15), (s * 292, 30, 15), "20x30")
     for sx in (-1, 1):
         for (yb, yt) in ((560, 670), (840, 730)):
             tube(B, "B", "Perna torre pivo", (sx * 200, yb, 30), (sx * 45, yt, 213), "20x30",
@@ -496,14 +693,14 @@ def build(shift_f1, shift_trk):
     M = "MOV"
     for s in (-1, 1):
         sd = "E" if s < 0 else "D"
-        tube(M, "M", "Longarina principal " + sd, (s * 270, 0, ZP - 25), (s * 270, 1780, ZP - 25), "30x50")
+        tube(M, "M", "Longarina principal " + sd, (s * 270, 10, ZP - 25), (s * 270, 1780, ZP - 25), "30x50")
     CROSS = [(25.0, "30x50"), (300.0, "20x30"), (650.0, "30x50"), (700.0, "30x50"), (750.0, "30x50"), (900.0, "20x30"),
              (1100.0, "20x30"), (1450.0, "20x30"), (1765.0, "20x30")]
     for y, pr in CROSS:
         h = PROFILES[pr][1]
         tube(M, "M", "Travessa chassi y%d" % int(y), (-255, y, ZP - h / 2), (255, y, ZP - h / 2), pr)
     for (ya, yb) in ((25.0, 300.0), (1100.0, 1450.0)):
-        tube(M, "M", "Diagonal piso y%d-%d" % (int(ya), int(yb)), (-250, ya + 15, ZP - 10), (250, yb - 15, ZP - 10),
+        tube(M, "M", "Diagonal piso y%d-%d" % (int(ya), int(yb)), (-225, ya, ZP - 10), (225, yb, ZP - 10),
              "10x20", cut="angulo")
     # the fork sits right on the three pivot crosses; the plate is a doubler, not a beam
     abox(M, "M", "CH", "Chapa pivo 300x140x8", -150, 630, ZP - 58, 150, 770, ZP - 50, "Chapa")
@@ -511,23 +708,42 @@ def build(shift_f1, shift_trk):
     # that side, so the rear rod force reaches the pivot crosses through this
     # shallow truss (top chord = main rail) instead of the rail alone in bending.
     door_f_est = PREV.get("door_f", 1080.0)
-    # node stations (y) and truss depth below the rail centreline: deepest at the
-    # pivot, where the rod moment F x 640 peaks, shallow at the ends (base clearance)
-    sill = [(ROD_Y, 60.0), (300.0, 130.0), (700.0, 205.0), (door_f_est, 60.0)]
+    # The bottom chord is a polyline whose end nodes lie on the rail axis (the chord is
+    # cut flush on the rail's bottom face) and whose inner nodes sit at depth d below
+    # the rail axis: deepest at the pivot, where the rod moment F x 640 peaks.
     zr = ZP - 25.0
+    sill = [(ROD_Y, 0.0), (300.0, 130.0), (700.0, 205.0), (door_f_est, 0.0)]
     for i in range(len(sill) - 1):
         (ya, da), (yb, db) = sill[i], sill[i + 1]
         tube(M, "M", "Banzo inferior soleira E y%d-%d" % (int(ya), int(yb)), (-270, ya, zr - da), (-270, yb, zr - db), "30x50",
              cut="angulo")
-    for y, d in sill:
-        tube(M, "M", "Montante soleira E y%d" % int(y), (-270, y, zr - d + 25), (-270, y, ZP - 50), "20x30", up=(0, 1, 0))
-    for i in range(len(sill) - 1):
-        (ya, da), (yb, db) = sill[i], sill[i + 1]
-        if i % 2 == 0:
-            p0, p1 = (-270, ya + 10, zr - da + 25), (-270, yb - 10, ZP - 50)
-        else:
-            p0, p1 = (-270, ya + 10, ZP - 50), (-270, yb - 10, zr - db + 25)
-        tube(M, "M", "Diagonal soleira E y%d-%d" % (int(ya), int(yb)), p0, p1, "20x30", cut="angulo")
+    def chord_z(y):
+        """z of the bottom-chord axis at station y."""
+        for (ya, da), (yb, db) in zip(sill[:-1], sill[1:]):
+            if ya <= y <= yb:
+                return zr - da - (db - da) * (y - ya) / (yb - ya)
+        return zr
+
+    def mitre_clear(i):
+        """Distance from node i of the bottom chord to a clear stand for an upright (past the mitre)."""
+        (ya, da), (yb, db), (yc, dc) = sill[i - 1], sill[i], sill[i + 1]
+        t1 = math.atan2(db - da, yb - ya)
+        t2 = math.atan2(dc - db, yc - yb)
+        return 25.0 * math.tan(abs(t2 - t1) / 2.0) + 15.0 + 6.0
+
+    # uprights stand on the chord segment that follows node 1 and precedes node 2
+    ups = [sill[1][0] + mitre_clear(1), sill[2][0] - mitre_clear(2)]
+    for y in ups:
+        tube(M, "M", "Montante soleira E y%d" % int(y), (-270, y, chord_z(y)), (-270, y, zr), "20x30", up=(0, 1, 0))
+    # one diagonal closes the only quadrilateral bay (the end bays are triangles closed
+    # by the uprights); its ends land on the side faces of the two uprights
+    y1, y2 = ups
+    m = 30.0
+    for _ in range(4):
+        z_lo, z_hi = chord_z(y1) + 25.0 + m, ZP - 50.0 - m
+        run = y2 - y1
+        m = 15.0 / (run / math.hypot(run, z_hi - z_lo)) + 8.0
+    tube(M, "M", "Diagonal soleira E y%d-%d" % (int(y1), int(y2)), (-270, y1, z_lo), (-270, y2, z_hi), "20x30", cut="angulo")
     for s in (-1, 1):
         sd = "E" if s < 0 else "D"
         abox(M, "M", "CH", "Suporte haste traseira " + sd, s * 285, ROD_Y - 25, ZP - 70, s * 330, ROD_Y + 25, ZP - 50, "Chapa")
@@ -543,7 +759,7 @@ def build(shift_f1, shift_trk):
         group="Junta_Cardan")
     for s in (-1, 1):
         sd = "E" if s < 0 else "D"
-        tube(M, "M", "Trilho banco " + sd, (s * 150, 5, ZP + 15), (s * 150, 1115, ZP + 15), "30x50", up=(1, 0, 0))
+        tube(M, "M", "Trilho banco " + sd, (s * 150, 10, ZP + 15), (s * 150, 1110, ZP + 15), "30x50", up=(1, 0, 0))
         tube(M, "M", "Trilho pedaleira " + sd, (s * 230, 740, ZP + 15), (s * 230, 1775, ZP + 15), "30x50", up=(1, 0, 0))
 
     # ======================= SEAT (1 DOF) =======================
@@ -574,7 +790,7 @@ def build(shift_f1, shift_trk):
     ys, ye = A_R[1] - 60, A_F[1] + 60
     for sx in (-1, 1):
         sd = "E" if sx < 0 else "D"
-        tube("CARRO", "BC", "Longarina carro banco " + sd, (sx * 150, ys, CARR_Z), (sx * 150, ye, CARR_Z), "20x30")
+        tube("CARRO", "BC", "Longarina carro banco " + sd, (sx * 150, ys + 5, CARR_Z), (sx * 150, ye - 5, CARR_Z), "20x30")
         for nm, a_pt in (("tras", A_R), ("diant", A_F)):
             abox("CARRO", "BC", "CH", "Mancal biela %s %s" % (nm, sd), sx * 140, a_pt[1] - 20, CARR_TOP,
                  sx * 160, a_pt[1] + 20, a_pt[2] + 12, "Chapa")
@@ -874,8 +1090,10 @@ def build(shift_f1, shift_trk):
         (51, lp_along - 35, v_dot(pl, N1) - 15, 63, lp_along + 35, -60), "Chapa")
     rod("HASTE_ASS", "Haste_Assento", "CARRO", gp, "ASSENTO", lever_p, "BC", "Haste comando assento", PAN_Q)
     abox("CARRO", "BC", "CH", "Suporte haste assento", 51, gp[1] - 20, CARR_TOP, 63, gp[1] + 20, gp[2] + 20, "Chapa")
+    seen_y = [ys + 15, ye - 15]
     for gy_, nm in ((gb[1], "encosto"), (gp[1], "assento")):
-        if min(abs(gy_ - (ys + 15)), abs(gy_ - (ye - 15))) > 25:
+        if min(abs(gy_ - y_) for y_ in seen_y) > 25:
+            seen_y.append(gy_)
             tube("CARRO", "BC", "Travessa carro banco haste " + nm, (-140, gy_, CARR_Z), (140, gy_, CARR_Z), "20x30")
     # drag links: chassis -> rear link, so the carriage slide follows the link angle
     if min(abs(G_DRAG[1] - y) for y, _ in CROSS) > 25:
@@ -1009,8 +1227,9 @@ def build(shift_f1, shift_trk):
     tube("MOV", "PE", "Poste suporte haste pedaleira", (60.0, g_p[1], ZP), (60.0, g_p[1], g_p[2] + 20), "20x30", up=(0, 1, 0))
     pin("MOV", "PE", "Pino haste pedaleira no poste", (46.0, g_p[1], g_p[2]), 24, 8)
     # brace: post + brace form a triangle, so the rod force is carried axially
-    tube("MOV", "PE", "Mao-francesa poste haste pedaleira", (60.0, g_p[1] - 15, g_p[2] + 5),
-         (60.0, g_p[1] - 15 - 0.75 * (g_p[2] - ZP), ZP), "20x30", cut="angulo")
+    foot_y, foot_pr = min(CROSS, key=lambda c: abs(c[0] - (g_p[1] - 15 - 0.75 * (g_p[2] - ZP))))
+    tube("MOV", "PE", "Mao-francesa poste haste pedaleira", (60.0, g_p[1], g_p[2] - 15),
+         (60.0, foot_y, ZP - 8.0), "20x30", cut="angulo")
     if min(abs(g_p[1] - y) for y, _ in CROSS) > 25:
         tube(M, "M", "Travessa suporte haste pedaleira", (-255, g_p[1], ZP - 15), (255, g_p[1], ZP - 15), "20x30")
     slots = {}
@@ -1093,11 +1312,23 @@ def build(shift_f1, shift_trk):
         for y in stations:
             tube("MOV", "A", "Coluna anel %s y%d" % (sd, int(y)), (sx * RING_X, y, ZP - 50), (sx * RING_X, y, RING_Z - 15),
                  "20x30", up=(0, 1, 0))
-    tube("MOV", "A", "Anel lado D", (RING_X, 15, RING_Z), (RING_X, 1775, RING_Z), "20x30")
+    cy = 15.0                                   # half of the 30 mm column side along y
+    tube("MOV", "A", "Anel lado D", (RING_X, 25.0 - cy, RING_Z), (RING_X, 1765.0 + cy, RING_Z), "20x30")
     tube("MOV", "A", "Travessa traseira rebaixada", (-RING_X + 10, 25, RING_REAR_Z), (RING_X - 10, 25, RING_REAR_Z), "20x30")
     tube("MOV", "A", "Anel dianteiro", (-RING_X + 10, 1765, RING_Z), (RING_X - 10, 1765, RING_Z), "20x30")
-    tube("MOV", "A", "Anel lado E traseiro", (-RING_X, 15, RING_Z), (-RING_X, door_r + 10, RING_Z), "20x30")
-    tube("MOV", "A", "Anel lado E dianteiro", (-RING_X, door_f - 10, RING_Z), (-RING_X, 1775, RING_Z), "20x30")
+    tube("MOV", "A", "Anel lado E traseiro", (-RING_X, 25.0 - cy, RING_Z), (-RING_X, door_r + cy, RING_Z), "20x30")
+    tube("MOV", "A", "Anel lado E dianteiro", (-RING_X, door_f - cy, RING_Z), (-RING_X, 1765.0 + cy, RING_Z), "20x30")
+
+    def span_diag(ya, yb, z_lo, z_hi):
+        """z of both ends of a diagonal between two vertical members (axes at ya, yb) so that
+        its end faces, cut on the members' side faces, stay clear of the rail and the chord."""
+        run = yb - ya
+        m = 30.0
+        for _ in range(4):
+            lo, hi = z_lo + m, z_hi - m
+            m = 15.0 / (run / math.hypot(run, hi - lo)) + 6.0
+        return z_lo + m, z_hi - m
+
     # diagonals only where the ring carries the rod moment into the pivot (the
     # two right-hand bays around y = 700) and in the end bays that guide the mast;
     # elsewhere the ring is a guide rail, not a truss (v3-leve)
@@ -1106,18 +1337,26 @@ def build(shift_f1, shift_trk):
         bays.append((-1, left_front[0], left_front[1], True))
     for sx, ya, yb, up_fwd in bays:
         sd = "E" if sx < 0 else "D"
-        za, zb = (ZP - 25, RING_Z - 15) if up_fwd else (RING_Z - 15, ZP - 25)
-        tube("MOV", "A", "Diagonal anel %s y%d-%d" % (sd, int(ya), int(yb)), (sx * RING_X, ya + 10, za),
-             (sx * RING_X, yb - 10, zb), "20x30", cut="angulo")
-    tube("MOV", "A", "Diagonal quadro traseiro", (-RING_X + 10, 25, ZP - 25), (RING_X - 10, 25, RING_REAR_Z - 15), "20x30",
-         cut="angulo")
-    tube("MOV", "A", "Diagonal quadro dianteiro", (RING_X - 10, 1765, ZP - 25), (-RING_X + 10, 1765, RING_Z - 15), "20x30",
-         cut="angulo")
+        lo, hi = span_diag(ya, yb, ZP - 50.0, RING_Z - 15.0)
+        za, zb = (lo, hi) if up_fwd else (hi, lo)
+        tube("MOV", "A", "Diagonal anel %s y%d-%d" % (sd, int(ya), int(yb)), (sx * RING_X, ya, za), (sx * RING_X, yb, zb),
+             "20x30", cut="angulo")
+    # end frames: a diagonal between the two 20x30 columns of the frame (cut on their inner faces)
+    run = 2 * RING_X
+    m = 30.0
+    for _ in range(4):
+        lo, hi = ZP + 25.0 + m, RING_REAR_Z - 15.0 - m
+        m = 15.0 / (run / math.hypot(run, hi - lo)) + 6.0
+    tube("MOV", "A", "Diagonal quadro traseiro", (-RING_X, 25, lo), (RING_X, 25, hi), "20x30", cut="angulo")
+    for _ in range(4):
+        lo, hi = ZP + 25.0 + m, RING_Z - 15.0 - m
+        m = 15.0 / (run / math.hypot(run, hi - lo)) + 6.0
+    tube("MOV", "A", "Diagonal quadro dianteiro", (RING_X, 1765, lo), (-RING_X, 1765, hi), "20x30", cut="angulo")
     # shifter fixed on the right ring, truck position (F1 uses the G920 paddles)
     y_sh = TRK["Hc"][1] + 200.0
     abox("MOV", "A", "CH", "Chapa suporte cambio 190x140x6", RING_X - 10, y_sh - 95, RING_Z + 15, 435, y_sh + 95,
          RING_Z + 21, "Chapa")
-    tube("MOV", "A", "Mao-francesa suporte cambio", (RING_X + 10, y_sh, RING_Z - 15), (425, y_sh, RING_Z + 12), "20x30",
+    tube("MOV", "A", "Mao-francesa suporte cambio", (RING_X, y_sh, RING_Z), (420, y_sh, RING_Z + 4.8), "20x30",
          up=(0, 1, 0), cut="angulo")
     shs = "Logitech Driving Force Shifter (130 x 165 x 167 mm, estimado)"
     abox("MOV", "A", "CO", "Cambio (carcaca)", 360 - SHIFTER_W / 2, y_sh - SHIFTER_D / 2, RING_Z + 21, 360 + SHIFTER_W / 2,
@@ -1194,6 +1433,7 @@ def build(shift_f1, shift_trk):
                  mq * SEG_FRAC["forearm_hand"], v_lerp(E, T, 0.6), bom=False)
             part(key, "MQ", "MQ", "Mao " + side, ("joint", "Manequim_Articulacao", T, 40, 1.0), "Junta", 0.0, T, bom=False)
 
+    resolve_joints()
     GEO.update(C1=C1, C2=C2, J=J, D_J=D_J, A_R=A_R, A_F=A_F, B_R1=B_R1, B_F1=B_F1, TH1=TH1, TH2=TH2,
                SEAT_SLIDE=SEAT_SLIDE, LINK_ROT=LINK_ROT, BACK_ROT=BACK_ROT, PAN_ROT=PAN_ROT, ys=ys, ye=ye,
                PED_P=PED_P, PED_SLIDE=PED_SLIDE, PED_ALPHA=PED_ALPHA, pys=pys, pye=pye, Ph1=Ph1,
@@ -1481,12 +1721,19 @@ if EMIT:
         grp = add_group(ents, nm)
         ge = grp.get_entities()
         if t == "tube":
-            _, p0, p1, prof, up = g
-            w, h, _t = PROFILES[prof]
-            d = v_sub(p1, p0)
-            xa, ya, za = axes_from(d, up)
-            ge.fill(box_geom(0, -w / 2, -h / 2, v_len(d), w / 2, h / 2), weld_vertices=True)
-            grp.set_transform(frame_tf(p0, xa, ya, za))
+            # hexahedron through the 8 corners computed by resolve_joints(): mitred / butted ends
+            info = g[5]
+            a_, u_, v_ = info["a"], info["u"], info["v"]
+            tg = GeometryInput()
+            tg.set_vertices([SUPoint3D(v_dot(v_sub(c, info["p0"]), a_) * MM, v_dot(v_sub(c, info["p0"]), u_) * MM,
+                                       v_dot(v_sub(c, info["p0"]), v_) * MM) for c in info["pts"][0] + info["pts"][1]])
+            for fv in [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]]:
+                lp = LoopInput()
+                for i in fv:
+                    lp.add_vertex_index(i)
+                _, tg = tg.add_face(lp)
+            ge.fill(tg, weld_vertices=True)
+            grp.set_transform(frame_tf(info["p0"], a_, u_, v_))
         elif t == "box":
             _, o, xa, ya, za, ext = g
             ge.fill(box_geom(*ext), weld_vertices=True)
