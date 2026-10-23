@@ -49,7 +49,7 @@ def part_obb(ns, p):
     t = g[0]
     vn, vs, va, vl = ns["v_norm"], ns["v_sub"], ns["v_add"], ns["v_len"]
     if t == "tube":
-        _, p0, p1, prof, up = g
+        _, p0, p1, prof, up = g[:5]
         w, h, _ = ns["PROFILES"][prof]
         xa, ya, za = ns["axes_from"](vs(p1, p0), up)
         return ns["v_lerp"](p0, p1, 0.5), (xa, ya, za), (vl(vs(p1, p0)) / 2, w / 2, h / 2)

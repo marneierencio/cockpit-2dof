@@ -1,0 +1,23 @@
+no,nome,pai,tipo,origem_mm_xyz,eixo_rotacao,giro_graus_F1_para_caminhao,curso_mm_xyz,variavel
+CARRO,Carro_Banco,MOV,translacao,0.0 326.3 425.0,1 0 0,0.00,0.0 50.7 0.0,modo
+BIELA_E_Tras,Biela_Banco_E_Tras,CARRO,rotacao_X,-180.0 326.3 455.0,1 0 0,63.87,0.0 0.0 0.0,modo
+BANCO,Banco,BIELA_E_Tras,rotacao_X,-180.0 686.1 468.1,1 0 0,-63.87,0.0 0.0 0.0,modo
+BIELA_D_Tras,Biela_Banco_D_Tras,CARRO,rotacao_X,180.0 326.3 455.0,1 0 0,63.87,0.0 0.0 0.0,modo
+BIELA_E_Diant,Biela_Banco_E_Diant,CARRO,rotacao_X,-180.0 632.5 503.5,1 0 0,63.87,0.0 0.0 0.0,modo
+BIELA_D_Diant,Biela_Banco_D_Diant,CARRO,rotacao_X,180.0 632.5 503.5,1 0 0,63.87,0.0 0.0 0.0,modo
+ASSENTO,Assento,BANCO,rotacao_X,0.0 602.1 551.0,1 0 0,-16.00,0.0 0.0 0.0,modo
+ENCOSTO,Encosto,BANCO,rotacao_X,0.0 602.1 551.0,1 0 0,-40.00,0.0 0.0 0.0,modo
+APOIO,Encosto_Superior,ENCOSTO,rotacao_X,0.0 140.7 874.1,1 0 0,40.00,0.0 0.0 0.0,modo
+TIRANTE_E,Tirante_Apoio_E,BANCO,rotacao_X,-268.0 684.0 608.3,1 0 0,-40.00,0.0 0.0 0.0,modo
+TIRANTE_D,Tirante_Apoio_D,BANCO,rotacao_X,268.0 684.0 608.3,1 0 0,-40.00,0.0 0.0 0.0,modo
+HASTE_ENC_E,Haste_Encosto_E,CARRO,rotacao_X,-100.0 461.0 450.4,1 0 0,79.49,0.0 0.0 0.0,modo
+HASTE_ENC_D,Haste_Encosto_D,CARRO,rotacao_X,100.0 461.0 450.4,1 0 0,79.49,0.0 0.0 0.0,modo
+HASTE_ASS,Haste_Assento,CARRO,rotacao_X,32.0 461.0 457.1,1 0 0,78.54,0.0 0.0 0.0,modo
+ARRASTO_E,Tirante_Carro_E,MOV,rotacao_X,-200.0 350.0 495.8,1 0 0,62.35,0.0 0.0 0.0,modo
+ARRASTO_D,Tirante_Carro_D,MOV,rotacao_X,200.0 350.0 495.8,1 0 0,62.35,0.0 0.0 0.0,modo
+PCARRO,Carro_Pedaleira,MOV,translacao,0.0 1326.5 425.0,1 0 0,0.00,0.0 -373.4 0.0,modo
+DECK,Pedaleira_Basculante,PCARRO,rotacao_X,0.0 1326.5 510.0,1 0 0,-35.00,0.0 0.0 0.0,modo
+HASTE_PED,Haste_Pedaleira,MOV,rotacao_X,32.0 963.7 680.0,1 0 0,-116.98,0.0 0.0 0.0,modo
+MASTRO,Mastro_Volante,MOV,translacao,0.0 1222.3 380.0,1 0 0,0.00,0.0 149.9 0.0,modo
+BRACO,Braco_Volante,MASTRO,rotacao_X,0.0 1222.3 1080.0,1 0 0,-35.00,0.0 0.0 0.0,modo
+PORTA,Porta_Barra,MOV,rotacao_X,-295.0 200.0 930.0,1 0 0,85.00,0.0 0.0 0.0,porta

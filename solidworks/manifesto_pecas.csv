@@ -1,0 +1,74 @@
+codigo,arquivo_step,nome,quantidade,instancias,tipo,tubos,corpos,material,volume_mm3,massa_kg,membros
+SOLD-BASE,pecas/SOLD-BASE_Soldado-Plataforma-Base.step,Soldado Plataforma_Base,1,SOLD-BASE,soldado,22,1,Aco carbono (tubos 10x20/20x30),2086977.6,16.384,"B-T01, B-T02, B-T03, B-T04, B-T05, B-T06, B-T07, B-T08, B-T09, B-T10, B-T11, B-T12, B-T13, B-T14, B-T15, B-T16, B-T17, B-T18, B-T19, B-T20, B-CH01, B-CH02, B-CH03, B-CH05, B-CH06, B-T21, B-T22, MO-CH01, MO-CH03, MO-CH05, MO-CH07"
+B-CO05,pecas/B-CO05_Redutor-planetario-E.step,Redutor planetario E,2,B-CO05; B-CO08,avulsa,0,1,Aco,526468.1,3.000,B-CO05
+B-CO06,pecas/B-CO06_Motor-de-passo-NEMA-34-E.step,Motor de passo NEMA 34 E,2,B-CO06; B-CO09,avulsa,0,1,Motor,1109400.0,5.500,B-CO06
+B-PI01,pecas/B-PI01_Eixo-saida-redutor-E.step,Eixo saida redutor E,2,B-PI01; B-PI02,avulsa,0,1,Aco,7225.7,0.057,B-PI01
+B-CH04,pecas/B-CH04_Braco-manivela-10mm-E.step,Braco manivela 10mm E,2,B-CH04; B-CH07,avulsa,0,1,Aco,75000.0,0.589,B-CH04
+B-CO07,pecas/B-CO07_Terminal-rotular-inferior-E.step,Terminal rotular inferior E,4,B-CO07; B-CO10; M-CO02; M-CO04,avulsa,0,1,Aco,9202.8,0.072,B-CO07
+B-CO11,pecas/B-CO11_Batente-borracha-E.step,Batente borracha E,2,B-CO11; B-CO12,avulsa,0,1,Borracha,63334.5,0.100,B-CO11
+MO-CO01,pecas/MO-CO01_Mola-de-tracao-arfagem-tras.step,Mola de tracao arfagem tras,2,MO-CO01; MO-CO02,avulsa,0,1,Mola,351858.4,0.600,MO-CO01
+MO-CO03,pecas/MO-CO03_Mola-de-tracao-rolagem-E.step,Mola de tracao rolagem E,2,MO-CO03; MO-CO04,avulsa,0,1,Mola,326725.6,0.600,MO-CO03
+B-CO01,pecas/B-CO01_Junta-Cardan-BASE.step,Junta Cardan (BASE),1,B-CO01,avulsa,0,4,Aco; Cardan,233671.5,1.834,"B-CO01, B-CO02, B-CO03, B-CO04"
+SOLD-MOV,pecas/SOLD-MOV_Soldado-Plataforma-Movel.step,Soldado Plataforma_Movel,1,SOLD-MOV,soldado,48,1,Aco carbono (tubos 10x20/20x30/30x50),4861171.8,38.189,"M-T01, M-T02, M-T03, M-T04, M-T05, M-T06, M-T07, M-T08, M-T09, M-T10, M-T11, M-T12, M-T13, M-CH01, M-T14, M-T15, M-T16, M-T17, M-T18, M-T19, M-CH02, M-CH03, M-T20, M-T21, M-T22, M-T23, M-T24, BC-CH15, BC-CH16, PE-T15, PE-T16, M-T25, A-T01, A-T02, A-T03, A-T04, A-T05, A-T06, A-T07, A-T08, A-T09, A-T10, A-T11, A-T12, A-T13, A-T14, A-T15, A-T16, A-T17, A-T18, A-T19, A-T20, A-CH01, A-T21, PO-CH01, PO-CH02, PO-CH03, PO-CH04, MO-CH02, MO-CH04, MO-CH06, MO-CH08"
+VO-CH08,pecas/VO-CH08_Chapa-came-volante-4mm-E-chapa-sem-tubo-de-apoio.step,Chapa came volante 4mm E [chapa sem tubo de apoio],1,VO-CH08,avulsa,0,1,Aco carbono,132031.3,1.036,VO-CH08
+VO-CH09,pecas/VO-CH09_Chapa-came-volante-4mm-D-chapa-sem-tubo-de-apoio.step,Chapa came volante 4mm D [chapa sem tubo de apoio],1,VO-CH09,avulsa,0,1,Aco carbono,132031.3,1.036,VO-CH09
+M-CO01,pecas/M-CO01_Haste-ligacao-E.step,Haste ligacao E,2,M-CO01; M-CO03,avulsa,0,1,Aco,24931.7,0.196,M-CO01
+BC-CO01,pecas/BC-CO01_Calco-borracha-apoio-F1-tras-E.step,Calco borracha apoio F1 tras E,2,BC-CO01; BC-CO03,avulsa,0,1,Borracha,47810.4,0.050,BC-CO01
+BC-CO02,pecas/BC-CO02_Calco-borracha-apoio-F1-diant-E.step,Calco borracha apoio F1 diant E,2,BC-CO02; BC-CO04,avulsa,0,1,Borracha,71819.6,0.050,BC-CO02
+PE-PI05,pecas/PE-PI05_Pino-haste-pedaleira-no-poste.step,Pino haste pedaleira no poste,1,PE-PI05,avulsa,0,1,Aco,9651.0,0.076,PE-PI05
+M-CO05,pecas/M-CO05_Junta-Cardan-MOV.step,Junta Cardan (MOV),1,M-CO05,avulsa,0,4,Aco; Cardan,265119.5,2.081,"M-CO05, M-CO06, M-CO07, M-CO08"
+A-CO01,pecas/A-CO01_G920-Cambio-MOV.step,G920 Cambio (MOV),1,A-CO01,avulsa,0,3,Aco; Carbono; Motor,1557185.8,0.900,"A-CO01, A-CO02, A-CO03"
+SOLD-CARRO,pecas/SOLD-CARRO_Soldado-Carro-Banco.step,Soldado Carro_Banco,1,SOLD-CARRO,soldado,5,1,Aco carbono (tubos 20x30),397902.8,3.124,"BC-T01, BC-CH01, BC-CH02, BC-T02, BC-CH03, BC-CH04, BC-T03, BC-T04, BC-CH10, BC-CH12, BC-CH14, BC-T21"
+BC-PI01,pecas/BC-PI01_Pino-mancal-biela-tras-E.step,Pino mancal biela tras E,4,BC-PI01; BC-PI02; BC-PI04; BC-PI05,avulsa,0,1,Aco,6031.9,0.047,BC-PI01
+BC-PI03,pecas/BC-PI03_Pino-indexador-trilho-banco-E.step,Pino indexador trilho banco E,4,BC-PI03; BC-PI06; PE-PI01; PE-PI02,avulsa,0,1,Aco,6785.8,0.053,BC-PI03
+SOLD-BIELA_E_Tras,pecas/SOLD-BIELA_E_Tras_Soldado-Biela-Banco-E-Tras.step,Soldado Biela_Banco_E_Tras,1,SOLD-BIELA_E_Tras,soldado,1,1,Aco carbono (tubos 20x30),43589.4,0.342,BC-T05
+BC-PI17,pecas/BC-PI17_Pino-tirante-arrasto-na-biela-E.step,Pino tirante arrasto na biela E,8,BC-PI17; BC-PI18; BC-PI13; BC-PI14; BC-PI15; BC-PI16; VO-PI04; VO-PI05,avulsa,0,1,Aco,2714.3,0.021,BC-PI17
+SOLD-BIELA_D_Tras,pecas/SOLD-BIELA_D_Tras_Soldado-Biela-Banco-D-Tras.step,Soldado Biela_Banco_D_Tras,1,SOLD-BIELA_D_Tras,soldado,1,1,Aco carbono (tubos 20x30),43589.4,0.342,BC-T06
+SOLD-BIELA_E_Diant,pecas/SOLD-BIELA_E_Diant_Soldado-Biela-Banco-E-Diant.step,Soldado Biela_Banco_E_Diant,1,SOLD-BIELA_E_Diant,soldado,1,1,Aco carbono (tubos 20x30),43589.4,0.342,BC-T07
+SOLD-BIELA_D_Diant,pecas/SOLD-BIELA_D_Diant_Soldado-Biela-Banco-D-Diant.step,Soldado Biela_Banco_D_Diant,1,SOLD-BIELA_D_Diant,soldado,1,1,Aco carbono (tubos 20x30),43589.4,0.342,BC-T08
+SOLD-BANCO,pecas/SOLD-BANCO_Soldado-Banco.step,Soldado Banco,1,SOLD-BANCO,soldado,2,1,Aco carbono (tubos 20x30),51343.0,0.403,"BC-T09, BC-T10"
+SOLD-BANCO-2,pecas/SOLD-BANCO-2_Soldado-Banco-2.step,Soldado Banco (2),1,SOLD-BANCO-2,soldado,2,1,Aco carbono (tubos 20x30),51343.0,0.403,"BC-T11, BC-T12"
+BC-CH05,pecas/BC-CH05_Orelha-tirante-subchassi-E-chapa-sem-tubo-de-apo.step,Orelha tirante subchassi E [chapa sem tubo de apoio],1,BC-CH05,avulsa,0,1,Aco carbono,11362.2,0.089,BC-CH05
+BC-CH07,pecas/BC-CH07_Orelha-tirante-subchassi-D-chapa-sem-tubo-de-apo.step,Orelha tirante subchassi D [chapa sem tubo de apoio],1,BC-CH07,avulsa,0,1,Aco carbono,11362.2,0.089,BC-CH07
+BC-PI07,pecas/BC-PI07_Pino-biela-subchassi-E.step,Pino biela subchassi E,4,BC-PI07; BC-PI08; BC-PI09; BC-PI10,avulsa,0,1,Aco,18095.6,0.142,BC-PI07
+BC-PI11,pecas/BC-PI11_Eixo-articulacao-assento-encosto.step,Eixo articulacao assento/encosto,1,BC-PI11,avulsa,0,1,Aco,182212.4,1.430,BC-PI11
+SOLD-ASSENTO,pecas/SOLD-ASSENTO_Soldado-Assento.step,Soldado Assento,1,SOLD-ASSENTO,soldado,1,1,Aco carbono (tubos 20x30),49177.8,0.386,BC-T13
+BC-CH13,pecas/BC-CH13_Orelha-haste-assento-chapa-12-chapa-sem-tubo-de-.step,Orelha haste assento (chapa 12) [chapa sem tubo de apoio],1,BC-CH13,avulsa,0,1,Aco carbono,79800.0,0.626,BC-CH13
+BC-ES01,pecas/BC-ES01_Assento-estofado-480x440x60.step,Assento estofado 480x440x60,1,BC-ES01,avulsa,0,1,Estofado,12672000.0,3.000,BC-ES01
+BC-ES02,pecas/BC-ES02_Aba-assento-E.step,Aba assento E,2,BC-ES02; BC-ES03,avulsa,0,1,Aba,962500.0,0.400,BC-ES02
+SOLD-ENCOSTO,pecas/SOLD-ENCOSTO_Soldado-Encosto.step,Soldado Encosto,1,SOLD-ENCOSTO,soldado,1,1,Aco carbono (tubos 20x30),49177.8,0.386,BC-T14
+BC-CH09,pecas/BC-CH09_Alavanca-encosto-E-chapa-12x70-chapa-sem-tubo-de.step,Alavanca encosto E (chapa 12x70) [chapa sem tubo de apoio],1,BC-CH09,avulsa,0,1,Aco carbono,147000.0,1.154,BC-CH09
+BC-CH11,pecas/BC-CH11_Alavanca-encosto-D-chapa-12x70-chapa-sem-tubo-de.step,Alavanca encosto D (chapa 12x70) [chapa sem tubo de apoio],1,BC-CH11,avulsa,0,1,Aco carbono,147000.0,1.154,BC-CH11
+BC-ES04,pecas/BC-ES04_Encosto-lombar-480x563x60.step,Encosto lombar 480x563x60,1,BC-ES04,avulsa,0,1,Estofado,16223076.6,3.500,BC-ES04
+BC-ES05,pecas/BC-ES05_Aba-encosto-E.step,Aba encosto E,2,BC-ES05; BC-ES06,avulsa,0,1,Aba,1505729.1,0.500,BC-ES05
+BC-PI12,pecas/BC-PI12_Eixo-articulacao-apoio-superior.step,Eixo articulacao apoio superior,1,BC-PI12,avulsa,0,1,Aco,133341.8,1.047,BC-PI12
+SOLD-APOIO,pecas/SOLD-APOIO_Soldado-Encosto-Superior.step,Soldado Encosto_Superior,1,SOLD-APOIO,soldado,1,1,Aco carbono (tubos 20x30),49177.8,0.386,BC-T15
+BC-CH06,pecas/BC-CH06_Orelha-tirante-apoio-E-chapa-sem-tubo-de-apoio.step,Orelha tirante apoio E [chapa sem tubo de apoio],1,BC-CH06,avulsa,0,1,Aco carbono,9600.0,0.075,BC-CH06
+BC-CH08,pecas/BC-CH08_Orelha-tirante-apoio-D-chapa-sem-tubo-de-apoio.step,Orelha tirante apoio D [chapa sem tubo de apoio],1,BC-CH08,avulsa,0,1,Aco carbono,9600.0,0.075,BC-CH08
+BC-ES07,pecas/BC-ES07_Apoio-ombros-cabeca-480x430x60.step,Apoio ombros/cabeca 480x430x60,1,BC-ES07,avulsa,0,1,Estofado,12384000.0,2.500,BC-ES07
+BC-ES08,pecas/BC-ES08_Aba-ombro-E.step,Aba ombro E,2,BC-ES08; BC-ES10,avulsa,0,1,Aba,432000.0,0.400,BC-ES08
+BC-ES09,pecas/BC-ES09_Aba-cabeca-E.step,Aba cabeca E,2,BC-ES09; BC-ES11,avulsa,0,1,Aba,540000.0,0.300,BC-ES09
+SOLD-TIRANTE_E,pecas/SOLD-TIRANTE_E_Soldado-Tirante-Apoio-E.step,Soldado Tirante_Apoio_E,1,SOLD-TIRANTE_E,soldado,1,1,Aco carbono (tubos 10x20),35920.5,0.282,BC-T16
+SOLD-TIRANTE_D,pecas/SOLD-TIRANTE_D_Soldado-Tirante-Apoio-D.step,Soldado Tirante_Apoio_D,1,SOLD-TIRANTE_D,soldado,1,1,Aco carbono (tubos 10x20),35920.5,0.282,BC-T17
+SOLD-HASTE_ENC_E,pecas/SOLD-HASTE_ENC_E_Soldado-Haste-Encosto-E.step,Soldado Haste_Encosto_E,1,SOLD-HASTE_ENC_E,soldado,1,1,Aco carbono (tubos 20x30),32002.5,0.251,BC-T18
+SOLD-HASTE_ENC_D,pecas/SOLD-HASTE_ENC_D_Soldado-Haste-Encosto-D.step,Soldado Haste_Encosto_D,1,SOLD-HASTE_ENC_D,soldado,1,1,Aco carbono (tubos 20x30),32002.5,0.251,BC-T19
+SOLD-HASTE_ASS,pecas/SOLD-HASTE_ASS_Soldado-Haste-Assento.step,Soldado Haste_Assento,1,SOLD-HASTE_ASS,soldado,1,1,Aco carbono (tubos 20x30),32530.8,0.255,BC-T20
+SOLD-ARRASTO_E,pecas/SOLD-ARRASTO_E_Soldado-Tirante-Carro-E.step,Soldado Tirante_Carro_E,1,SOLD-ARRASTO_E,soldado,1,1,Aco carbono (tubos 20x30),7582.0,0.060,BC-T22
+SOLD-ARRASTO_D,pecas/SOLD-ARRASTO_D_Soldado-Tirante-Carro-D.step,Soldado Tirante_Carro_D,1,SOLD-ARRASTO_D,soldado,1,1,Aco carbono (tubos 20x30),7582.0,0.060,BC-T23
+SOLD-PCARRO,pecas/SOLD-PCARRO_Soldado-Carro-Pedaleira.step,Soldado Carro_Pedaleira,1,SOLD-PCARRO,soldado,5,1,Aco carbono (tubos 20x30),120709.2,0.948,"PE-T01, PE-T02, PE-T03, PE-T04, PE-T05"
+PE-PI03,pecas/PE-PI03_Eixo-pivo-pedaleira.step,Eixo pivo pedaleira,1,PE-PI03,avulsa,0,1,Aco,124689.8,0.979,PE-PI03
+SOLD-DECK,pecas/SOLD-DECK_Soldado-Pedaleira-Basculante.step,Soldado Pedaleira_Basculante,1,SOLD-DECK,soldado,8,1,Aco carbono (tubos 20x30),594110.0,4.673,"PE-CH01, PE-T06, PE-T07, PE-T08, PE-T09, PE-T10, PE-T11, PE-T12, PE-T13"
+PE-PI04,pecas/PE-PI04_Pino-haste-alavanca-pedaleira.step,Pino haste/alavanca pedaleira,2,PE-PI04; PO-PI01,avulsa,0,1,Aco,10053.1,0.079,PE-PI04
+PE-CO01,pecas/PE-CO01_G920-Pedais-DECK.step,G920 Pedais (DECK),1,PE-CO01,avulsa,0,5,Carbono; Motor; PedalAl,8429812.5,3.100,"PE-CO01, PE-CO02, PE-CO03, PE-CO04, PE-CO05"
+SOLD-HASTE_PED,pecas/SOLD-HASTE_PED_Soldado-Haste-Pedaleira.step,Soldado Haste_Pedaleira,1,SOLD-HASTE_PED,soldado,1,1,Aco carbono (tubos 20x30),23440.9,0.184,PE-T14
+SOLD-MASTRO,pecas/SOLD-MASTRO_Soldado-Mastro-Volante.step,Soldado Mastro_Volante,1,SOLD-MASTRO,soldado,1,1,Aco carbono (tubos 30x50),208377.7,1.653,"VO-CH01, VO-T01, VO-CH02, VO-CH03"
+SOLD-MASTRO-2,pecas/SOLD-MASTRO-2_Soldado-Mastro-Volante-2.step,Soldado Mastro_Volante (2),1,SOLD-MASTRO-2,soldado,1,1,Aco carbono (tubos 30x50),208377.7,1.653,"VO-CH04, VO-T02, VO-CH05, VO-CH06"
+VO-PI01,pecas/VO-PI01_Pino-indexador-mastro-E.step,Pino indexador mastro E,2,VO-PI01; VO-PI02,avulsa,0,1,Aco,2714.3,0.021,VO-PI01
+VO-CO01,pecas/VO-CO01_Mancal-tubo-torcao-E.step,Mancal tubo torcao E,2,VO-CO01; VO-CO02,avulsa,0,1,Aco,84823.0,0.400,VO-CO01
+SOLD-BRACO,pecas/SOLD-BRACO_Soldado-Braco-Volante.step,Soldado Braco_Volante,1,SOLD-BRACO,soldado,3,1,Aco carbono (tubos 30x50),474699.1,3.739,"VO-T03, VO-CH07, VO-T04, VO-T05"
+SOLD-BRACO-2,pecas/SOLD-BRACO-2_Soldado-Braco-Volante-2.step,Soldado Braco_Volante (2),1,SOLD-BRACO-2,soldado,1,1,Aco carbono (tubos 20x30),16988.7,0.133,VO-T06
+SOLD-BRACO-3,pecas/SOLD-BRACO-3_Soldado-Braco-Volante-3.step,Soldado Braco_Volante (3),1,SOLD-BRACO-3,soldado,1,1,Aco carbono (tubos 20x30),16988.7,0.133,VO-T07
+VO-PI03,pecas/VO-PI03_Eixo-pivo-volante.step,Eixo pivo volante,1,VO-PI03,avulsa,0,1,Aco,294524.3,2.312,VO-PI03
+VO-CO03,pecas/VO-CO03_G920-Volante-BRACO.step,G920 Volante (BRACO),1,VO-CO03,avulsa,0,4,Carbono; Motor; Volante,11781075.2,2.250,"VO-CO03, VO-CO04, VO-CO05, VO-CO06"
+SOLD-PORTA,pecas/SOLD-PORTA_Soldado-Porta-Barra.step,Soldado Porta_Barra,1,SOLD-PORTA,soldado,1,1,Aco carbono (tubos 30x50),165816.9,1.302,PO-T01
+PO-PI02,pecas/PO-PI02_Trava-rapida-da-porta.step,Trava rapida da porta,1,PO-PI02,avulsa,0,1,Aco,3769.9,0.050,PO-PI02
